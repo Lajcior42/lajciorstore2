@@ -929,7 +929,7 @@
     import {
         getFirestore,
         collection, getDocs, addDoc,
-        doc, setDoc, getDoc, updateDoc,
+        doc, setDoc, getDoc, updateDoc, arrayUnion,
         increment, serverTimestamp, query, orderBy, limit
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -1177,14 +1177,19 @@
             const price = typeof o.price === 'number' ? o.price.toFixed(2).replace('.',',') + ' zł' : '—';
             const isDelivered = o.status === 'delivered';
             const dotClass = o.game === 'robux' ? 'dot-robux' : 'dot-gta';
-            const gpLink = o.gamepassLink ? `<a href="${o.gamepassLink}" target="_blank" style="color:#a855f7;font-size:11px;text-decoration:none;">🎮 Gamepass</a>` : '—';
+            const gpLink = o.gamepassLink
+                ? `<a href="${o.gamepassLink}" target="_blank" style="color:#a855f7;font-size:12px;font-weight:700;text-decoration:none;padding:4px 10px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);border-radius:8px;">🎮 Otwórz</a>`
+                : '<span style="color:#333;font-size:11px;">brak</span>';
+            const completeBtn = isDelivered
+                ? `<span class="badge badge-delivered">Dostarczono</span>`
+                : `<span class="badge badge-pending" style="cursor:pointer;" onclick="markDelivered('${o.id}', '${o.userId || ''}', '${o.clientNick || ''}', '${o.title || ''}', '${o.game || ''}', ${o.price || 0})">W realizacji — kliknij ✓</span>`;
             return `<tr>
                 <td><div class="user-cell"><div class="user-avatar-sm">${initials}</div><div><div style="font-weight:700;font-size:13px;">${nick}</div><div style="font-size:11px;color:#555;">${email}</div></div></div></td>
                 <td><div class="product-cell"><div class="product-dot ${dotClass}"></div>${o.title || '—'}</div></td>
                 <td style="font-weight:700;">${price}</td>
                 <td style="color:#666;">${date}</td>
                 <td>${gpLink}</td>
-                <td><span class="badge ${isDelivered ? 'badge-delivered' : 'badge-pending'}">${isDelivered ? 'Dostarczono' : 'W realizacji'}</span></td>
+                <td>${completeBtn}</td>
             </tr>`;
         }).join('');
     }
@@ -1291,6 +1296,36 @@
 
         btn.textContent = 'DODAJ ZAMÓWIENIE';
         btn.disabled = false;
+    };
+
+    // ── Mark order as delivered ──
+    window.markDelivered = async function(orderId, userId, clientNick, title, game, price) {
+        if (!confirm(`Oznaczyć "${title}" jako dostarczone?`)) return;
+        try {
+            // Update order status in orders collection
+            await updateDoc(doc(db, 'orders', orderId), { status: 'delivered' });
+
+            // Also update in user's zamowienia array if userId exists
+            if (userId) {
+                const userRef = doc(db, 'users', userId);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    const zamowienia = (userData.zamowienia || []).map(z => {
+                        if (z.title === title && z.status === 'pending') {
+                            return { ...z, status: 'delivered' };
+                        }
+                        return z;
+                    });
+                    await updateDoc(userRef, { zamowienia });
+                }
+            }
+
+            alert('Zamówienie oznaczone jako dostarczone!');
+            location.reload();
+        } catch(e) {
+            alert('Błąd: ' + e.message);
+        }
     };
 </script>
 </body>
