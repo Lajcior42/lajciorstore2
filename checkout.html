@@ -667,6 +667,36 @@
             status: 'pending',
             createdAt: serverTimestamp()
         });
+
+        // Discord webhook
+        const webhookUrl = 'https://discord.com/api/webhooks/1473394614705852508/-VmT2gRIz597mh0-FqA0xfK0a-i5wX5jD7-WHXttdOhiOoDZJsZueMD9ODx6rY-2LFxY';
+        const method = selectedMethod === 'blik' ? 'BLIK' : 'Litecoin (LTC)';
+        const gameLabel = productGame === 'robux' ? '🟥 Roblox' : '🟨 GTA V';
+
+        await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: 'LiteStore',
+                avatar_url: 'https://cdn.discordapp.com/embed/avatars/0.png',
+                embeds: [{
+                    title: '🛒 Nowe zamówienie!',
+                    color: 0xf97316,
+                    fields: [
+                        { name: '📦 Produkt', value: `**${productName}**\n${productType}`, inline: true },
+                        { name: '🎮 Gra', value: gameLabel, inline: true },
+                        { name: '💰 Kwota', value: `**${productPrice}**`, inline: true },
+                        { name: '💳 Metoda płatności', value: method, inline: true },
+                        { name: '👤 Nick Roblox', value: nick || '—', inline: true },
+                        { name: '📧 Email', value: email || '—', inline: true },
+                        { name: '🎫 Gamepass', value: link ? `[Kliknij tutaj](${link})` : '—', inline: false },
+                        ...(txHash ? [{ name: '🔗 TX Hash (LTC)', value: `\`${txHash}\``, inline: false }] : []),
+                    ],
+                    footer: { text: 'LiteStore • Status: ⏳ Oczekuje na realizację' },
+                    timestamp: new Date().toISOString()
+                }]
+            })
+        }).catch(() => {}); // nie blokuj zamówienia jeśli webhook padnie
     };
 </script>
 
