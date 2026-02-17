@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LITESTORE — Owner Panel</title>
-    <!-- Chart.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <title>LITESTORE — Płatność</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -14,926 +12,636 @@
             background: #111;
             color: #fff;
             min-height: 100vh;
-        }
-
-        /* ─── AUTH GATE ─── */
-        #auth-gate {
-            position: fixed;
-            inset: 0;
-            background: #111;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
-        }
-        .gate-card {
-            text-align: center;
-            padding: 48px;
-        }
-        .gate-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-        .gate-title {
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            color: #ef4444;
-            margin-bottom: 10px;
-        }
-        .gate-sub {
-            font-size: 13px;
-            color: #555;
-        }
-        #loading-gate {
-            position: fixed;
-            inset: 0;
-            background: #111;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9998;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .spinner {
-            width: 36px;
-            height: 36px;
-            border: 2px solid rgba(255,255,255,0.1);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ─── LAYOUT ─── */
-        #app { display: none; }
-
-        .sidebar {
-            position: fixed;
-            left: 0; top: 0;
-            width: 260px;
-            height: 100vh;
-            background: rgba(10,10,10,0.98);
-            border-right: 1px solid rgba(255,255,255,0.07);
-            display: flex;
-            flex-direction: column;
-            z-index: 100;
-            border-radius: 0 24px 24px 0;
-        }
-        .sidebar-logo {
-            padding: 28px 24px 24px;
-            border-bottom: 1px solid rgba(255,255,255,0.07);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .logo-icon {
-            width: 36px; height: 36px;
-            background: #fff;
-            border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-        .logo-icon svg { width: 20px; height: 20px; fill: #000; }
-        .logo-text { font-size: 16px; font-weight: 800; letter-spacing: 2px; }
-        .logo-badge {
-            font-size: 8px;
-            letter-spacing: 1.5px;
-            color: #ef4444;
-            background: rgba(239,68,68,0.1);
-            border: 1px solid rgba(239,68,68,0.2);
-            padding: 3px 8px;
-            border-radius: 6px;
-            margin-left: auto;
-            font-weight: 700;
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 20px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            overflow-y: auto;
-        }
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 14px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: #555;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            background: transparent;
-            width: 100%;
-            text-align: left;
-        }
-        .nav-item svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
-        .nav-item:hover { background: rgba(255,255,255,0.05); color: #aaa; }
-        .nav-item.active { background: rgba(255,255,255,0.08); color: #fff; }
-
-        .sidebar-footer {
-            padding: 16px;
-            border-top: 1px solid rgba(255,255,255,0.07);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .owner-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.03);
-        }
-        .owner-avatar {
-            width: 32px; height: 32px;
-            background: #fff;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px;
-            color: #000;
-            font-weight: 800;
-            flex-shrink: 0;
-        }
-        .owner-name { font-size: 11px; font-weight: 700; }
-        .owner-role { font-size: 9px; color: #ef4444; letter-spacing: 1px; font-weight: 700; }
-        .btn-logout {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            background: rgba(239,68,68,0.08);
-            border: 1px solid rgba(239,68,68,0.15);
-            border-radius: 10px;
-            color: #ef4444;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: all 0.2s;
-            width: 100%;
-        }
-        .btn-logout svg { width: 14px; height: 14px; fill: currentColor; }
-        .btn-logout:hover { background: rgba(239,68,68,0.15); }
-
-        /* ─── MAIN ─── */
-        .main {
-            margin-left: 260px;
-            padding: 36px 40px;
-            min-height: 100vh;
-        }
-        .page { display: none; }
-        .page.active { display: block; }
-
-        .page-header {
-            margin-bottom: 36px;
-        }
-        .page-label {
-            font-size: 10px;
-            letter-spacing: 3px;
-            color: #555;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-        .page-title {
-            font-size: 36px;
-            font-weight: 900;
-            letter-spacing: -1px;
-        }
-
-        /* ─── STAT CARDS ─── */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 32px;
-        }
-        .stat-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 20px;
             padding: 24px;
+        }
+
+        /* Mountain background */
+        .bg-mountains {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-mountains svg {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 70%;
+            opacity: 0.07;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 80% 80%, rgba(255,255,255,0.02) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Back link */
+        .back-link {
+            position: fixed;
+            top: 28px; left: 28px;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 11px; font-weight: 700; letter-spacing: 2px;
+            color: #444; text-decoration: none; text-transform: uppercase;
+            transition: color 0.2s; z-index: 10;
+        }
+        .back-link:hover { color: #fff; }
+        .back-link svg { width: 16px; height: 16px; fill: currentColor; }
+
+        /* Layout */
+        .checkout-wrap {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 860px;
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* Card base */
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 32px;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s;
         }
-        .stat-card:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.12);
-            transform: translateY(-2px);
-        }
-        .stat-card::before {
+        .card::before {
             content: '';
             position: absolute;
             top: 0; left: 12%; right: 12%;
             height: 1px;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
         }
-        .stat-icon {
-            width: 40px; height: 40px;
-            background: rgba(255,255,255,0.07);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 16px;
-        }
-        .stat-icon svg { width: 20px; height: 20px; fill: #fff; }
-        .stat-icon.green { background: rgba(34,197,94,0.1); }
-        .stat-icon.green svg { fill: #22c55e; }
-        .stat-icon.blue { background: rgba(59,130,246,0.1); }
-        .stat-icon.blue svg { fill: #3b82f6; }
-        .stat-icon.orange { background: rgba(249,115,22,0.1); }
-        .stat-icon.orange svg { fill: #f97316; }
-        .stat-label {
-            font-size: 9px;
-            letter-spacing: 2.5px;
-            color: #555;
-            text-transform: uppercase;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .stat-value {
-            font-size: 32px;
-            font-weight: 900;
-            letter-spacing: -1px;
-            margin-bottom: 4px;
-        }
-        .stat-sub {
-            font-size: 11px;
-            color: #555;
-        }
-        .stat-sub.up { color: #22c55e; }
-        .stat-sub.down { color: #ef4444; }
 
-        /* ─── CHARTS ─── */
-        .charts-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-            margin-bottom: 32px;
+        /* Order summary */
+        .order-label {
+            font-size: 9px; letter-spacing: 3px; color: #555;
+            text-transform: uppercase; font-weight: 700; margin-bottom: 20px;
         }
-        .chart-card {
-            background: rgba(255,255,255,0.03);
+        .order-product {
+            display: flex; align-items: center; gap: 16px; margin-bottom: 28px;
+        }
+        .order-icon {
+            width: 56px; height: 56px;
+            background: #fff; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .order-icon svg { width: 28px; height: 28px; fill: #000; }
+        .order-icon.dark { background: rgba(255,255,255,0.1); }
+        .order-icon.dark svg { fill: #fff; }
+        .order-type { font-size: 10px; color: #555; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+        .order-name { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+        .divider-line {
+            height: 1px; background: rgba(255,255,255,0.06); margin: 20px 0;
+        }
+        .price-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px;
+        }
+        .price-row-label { font-size: 12px; color: #555; }
+        .price-row-val { font-size: 12px; color: #888; }
+        .price-total {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 16px;
+        }
+        .price-total-label { font-size: 13px; font-weight: 700; letter-spacing: 1px; }
+        .price-total-val { font-size: 26px; font-weight: 900; letter-spacing: -0.5px; }
+
+        .trust-badges {
+            display: flex; flex-direction: column; gap: 10px; margin-top: 24px;
+        }
+        .trust-badge {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 11px; color: #444;
+        }
+        .trust-badge svg { width: 14px; height: 14px; fill: #444; flex-shrink: 0; }
+
+        /* Payment form */
+        .form-label-top {
+            font-size: 9px; letter-spacing: 3px; color: #555;
+            text-transform: uppercase; font-weight: 700; margin-bottom: 20px;
+        }
+
+        /* Steps */
+        .steps {
+            display: flex; gap: 0; margin-bottom: 28px;
             border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 20px;
-            padding: 28px;
+            border-radius: 14px; overflow: hidden;
         }
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 24px;
-        }
-        .chart-title {
-            font-size: 14px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }
-        .chart-sub {
-            font-size: 11px;
-            color: #555;
-        }
-        .chart-period {
-            display: flex;
-            gap: 6px;
-        }
-        .period-btn {
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1px;
+        .step {
+            flex: 1; padding: 12px 8px; text-align: center;
+            font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; color: #444;
             background: transparent;
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #555;
-            cursor: pointer;
-            transition: all 0.2s;
+            border-right: 1px solid rgba(255,255,255,0.07);
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
         }
-        .period-btn.active {
-            background: #fff;
-            color: #000;
-            border-color: #fff;
-        }
-        .chart-wrap { position: relative; height: 200px; }
-
-        /* ─── ORDERS TABLE ─── */
-        .table-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 20px;
-            padding: 28px;
-            margin-bottom: 32px;
-        }
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-        .table-title { font-size: 14px; font-weight: 800; }
-        .badge {
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        .badge-pending { background: rgba(249,115,22,0.15); color: #f97316; }
-        .badge-delivered { background: rgba(34,197,94,0.1); color: #22c55e; }
-        .badge-neutral { background: rgba(255,255,255,0.07); color: #888; }
-
-        table { width: 100%; border-collapse: collapse; }
-        th {
-            text-align: left;
-            font-size: 9px;
-            letter-spacing: 2px;
-            color: #444;
-            text-transform: uppercase;
-            padding: 0 16px 16px;
-            font-weight: 700;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        td {
-            padding: 16px;
-            font-size: 13px;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            vertical-align: middle;
-        }
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background: rgba(255,255,255,0.02); }
-
-        .user-cell { display: flex; align-items: center; gap: 10px; }
-        .user-avatar-sm {
-            width: 28px; height: 28px;
-            background: rgba(255,255,255,0.08);
+        .step:last-child { border-right: none; }
+        .step.active { color: #fff; background: rgba(255,255,255,0.06); }
+        .step.done { color: #22c55e; }
+        .step-num {
+            width: 20px; height: 20px;
             border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            font-size: 10px; font-weight: 800;
             display: flex; align-items: center; justify-content: center;
-            font-size: 11px;
-            font-weight: 700;
-            flex-shrink: 0;
         }
-        .product-cell { display: flex; align-items: center; gap: 8px; }
-        .product-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .dot-robux { background: #a855f7; }
-        .dot-gta { background: #3b82f6; }
+        .step.active .step-num { background: #fff; color: #000; }
+        .step.done .step-num { background: #22c55e; color: #000; }
 
-        /* ─── TOP PRODUCTS ─── */
-        .products-list { display: flex; flex-direction: column; gap: 12px; }
-        .product-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .product-rank {
-            font-size: 11px;
-            color: #444;
-            font-weight: 700;
-            width: 20px;
-        }
-        .product-info { flex: 1; }
-        .product-name-sm { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
-        .product-bar-wrap {
-            height: 4px;
-            background: rgba(255,255,255,0.06);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        .product-bar {
-            height: 100%;
-            border-radius: 2px;
-            background: linear-gradient(90deg, rgba(255,255,255,0.3), rgba(255,255,255,0.6));
-        }
-        .product-count { font-size: 12px; color: #888; font-weight: 700; }
+        /* Pages */
+        .checkout-page { display: none; }
+        .checkout-page.active { display: block; }
 
-        /* ─── VISITS PAGE ─── */
-        .visits-info {
-            background: rgba(59,130,246,0.08);
-            border: 1px solid rgba(59,130,246,0.15);
-            border-radius: 16px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
+        /* Method select */
+        .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .method-card {
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: 16px; padding: 20px 16px;
+            cursor: pointer; transition: all 0.2s;
+            background: rgba(255,255,255,0.02);
+            text-align: center;
         }
-        .visits-info svg { width: 18px; height: 18px; fill: #3b82f6; flex-shrink: 0; margin-top: 1px; }
-        .visits-info p { font-size: 13px; color: #888; line-height: 1.6; }
-        .visits-info strong { color: #fff; }
+        .method-card:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
+        .method-card.selected { border-color: #fff; background: rgba(255,255,255,0.07); }
+        .method-icon { font-size: 28px; margin-bottom: 10px; }
+        .method-icon-svg {
+            width: 48px; height: 48px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 12px;
+        }
+        .method-icon-svg svg { width: 26px; height: 26px; fill: #fff; }
+        .method-name { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
+        .method-sub { font-size: 10px; color: #555; letter-spacing: 1px; }
 
-        /* ─── ADD ORDER FORM ─── */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-        .form-group { display: flex; flex-direction: column; gap: 8px; }
-        .form-group.full { grid-column: 1 / -1; }
-        .form-label {
-            font-size: 10px;
-            letter-spacing: 2px;
-            color: #555;
-            text-transform: uppercase;
-            font-weight: 700;
-        }
-        .form-input, .form-select {
-            padding: 14px 16px;
-            background: rgba(255,255,255,0.05);
+        /* BLIK details */
+        .blik-box {
+            background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 14px;
-            font-family: inherit;
-            outline: none;
-            transition: all 0.2s;
+            border-radius: 16px; padding: 24px;
+            margin-bottom: 20px;
         }
-        .form-input:focus, .form-select:focus {
-            border-color: rgba(255,255,255,0.2);
+        .blik-title {
+            font-size: 11px; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; color: #888; margin-bottom: 16px;
+        }
+        .blik-number {
+            font-size: 32px; font-weight: 900; letter-spacing: 4px;
+            margin-bottom: 8px; font-variant-numeric: tabular-nums;
+        }
+        .blik-amount {
+            font-size: 13px; color: #555; margin-bottom: 20px;
+        }
+        .blik-steps { display: flex; flex-direction: column; gap: 10px; }
+        .blik-step {
+            display: flex; align-items: flex-start; gap: 12px;
+            font-size: 13px; color: #888; line-height: 1.4;
+        }
+        .blik-step-num {
+            width: 22px; height: 22px; border-radius: 50%;
             background: rgba(255,255,255,0.08);
-        }
-        .form-input::placeholder { color: #333; }
-        .form-select option { background: #1a1a1a; }
-        .btn-submit {
-            padding: 16px 32px;
-            background: #fff;
-            color: #000;
-            border: none;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        .btn-submit:hover { background: #f0f0f0; transform: translateY(-1px); }
-        .form-success {
-            display: none;
-            padding: 14px 18px;
-            background: rgba(34,197,94,0.1);
-            border: 1px solid rgba(34,197,94,0.2);
-            border-radius: 12px;
-            font-size: 13px;
-            color: #22c55e;
-            margin-top: 12px;
+            font-size: 10px; font-weight: 800; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-top: 1px;
         }
 
-        /* ─── RESPONSIVE ─── */
-        @media (max-width: 1200px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .charts-row { grid-template-columns: 1fr; }
+        /* Crypto details */
+        .crypto-box {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px; padding: 24px;
+            margin-bottom: 20px;
         }
-        @media (max-width: 900px) {
-            .sidebar { width: 220px; }
-            .main { margin-left: 220px; padding: 24px 20px; }
+        .crypto-title {
+            font-size: 11px; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; color: #888; margin-bottom: 16px;
         }
+        .crypto-network {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2);
+            color: #a855f7; font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+            padding: 5px 12px; border-radius: 8px; margin-bottom: 14px;
+            text-transform: uppercase;
+        }
+        .crypto-address-label { font-size: 10px; color: #555; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+        .crypto-address {
+            font-size: 11px; font-family: monospace;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; padding: 12px 14px;
+            word-break: break-all; color: #ccc; line-height: 1.6;
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            margin-bottom: 14px;
+        }
+        .copy-btn {
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; padding: 6px 10px; color: #888;
+            font-size: 10px; font-weight: 700; letter-spacing: 1px;
+            cursor: pointer; flex-shrink: 0; transition: all 0.2s;
+            text-transform: uppercase;
+        }
+        .copy-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .crypto-amount-box {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.04); border-radius: 10px; padding: 12px 14px;
+            margin-bottom: 14px;
+        }
+        .crypto-amount-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 1.5px; }
+        .crypto-amount-val { font-size: 16px; font-weight: 900; }
+        .crypto-note { font-size: 11px; color: #444; line-height: 1.6; }
+
+        /* Roblox form */
+        .field { margin-bottom: 20px; }
+        .field label {
+            display: block; font-size: 10px; font-weight: 700;
+            letter-spacing: 2px; color: #555; text-transform: uppercase; margin-bottom: 10px;
+        }
+        .field input {
+            width: 100%; padding: 15px 18px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; color: #fff; font-size: 14px; font-family: inherit;
+            outline: none; transition: all 0.25s;
+        }
+        .field input:focus {
+            border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.04);
+        }
+        .field input::placeholder { color: #333; }
+        .field-hint { font-size: 11px; color: #444; margin-top: 8px; line-height: 1.5; }
+
+        /* Confirm checkbox */
+        .confirm-row {
+            display: flex; align-items: flex-start; gap: 12px;
+            margin-bottom: 24px; cursor: pointer;
+        }
+        .confirm-row input[type=checkbox] { margin-top: 2px; accent-color: #fff; flex-shrink: 0; }
+        .confirm-row span { font-size: 12px; color: #555; line-height: 1.6; }
+
+        /* Buttons */
+        .btn-main {
+            width: 100%; padding: 17px;
+            background: #fff; color: #000; border: none;
+            border-radius: 14px; font-size: 11px; font-weight: 800;
+            letter-spacing: 2.5px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.2s; font-family: inherit;
+        }
+        .btn-main:hover { background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,255,255,0.12); }
+        .btn-main:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-back-step {
+            width: 100%; padding: 13px;
+            background: transparent; color: #555; border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; font-size: 11px; font-weight: 700;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.2s; font-family: inherit;
+            margin-top: 10px;
+        }
+        .btn-back-step:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+
+        /* Success */
+        .success-icon {
+            width: 72px; height: 72px;
+            background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+        }
+        .success-icon svg { width: 36px; height: 36px; fill: #22c55e; }
+        .success-title { font-size: 24px; font-weight: 900; text-align: center; margin-bottom: 10px; }
+        .success-sub { font-size: 14px; color: #666; text-align: center; line-height: 1.6; margin-bottom: 28px; }
+        .success-info {
+            background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.15);
+            border-radius: 14px; padding: 20px; margin-bottom: 20px;
+        }
+        .success-info-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+        .success-info-row:last-child { margin-bottom: 0; }
+        .success-info-label { color: #555; }
+        .success-info-val { font-weight: 700; }
+
+        /* Error msg */
+        #error-msg { font-size: 12px; color: #ef4444; margin-bottom: 12px; min-height: 16px; }
+
+        /* Responsive */
         @media (max-width: 700px) {
-            .sidebar {
-                position: fixed;
-                bottom: 0; left: 0; right: 0;
-                width: 100%;
-                height: auto;
-                flex-direction: row;
-                border-radius: 20px 20px 0 0;
-                border-right: none;
-                border-top: 1px solid rgba(255,255,255,0.07);
-            }
-            .sidebar-logo, .sidebar-footer { display: none; }
-            .sidebar-nav {
-                flex-direction: row;
-                padding: 12px;
-                gap: 4px;
-                justify-content: space-around;
-                width: 100%;
-                overflow-x: auto;
-            }
-            .nav-item { flex-direction: column; gap: 4px; padding: 8px 12px; font-size: 8px; }
-            .nav-item svg { width: 20px; height: 20px; }
-            .main { margin-left: 0; padding: 20px 16px 100px; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .stat-value { font-size: 24px; }
-            .page-title { font-size: 26px; }
-            .form-grid { grid-template-columns: 1fr; }
+            .checkout-wrap { grid-template-columns: 1fr; }
+            .method-grid { grid-template-columns: 1fr 1fr; }
+            .back-link { top: 16px; left: 16px; }
+            body { padding: 70px 16px 24px; align-items: flex-start; }
         }
     </style>
 </head>
 <body>
 
-<!-- Loading -->
-<div id="loading-gate">
-    <div class="spinner"></div>
-    <div style="font-size:11px;letter-spacing:2px;color:#444;">WERYFIKACJA...</div>
+<a href="index.html" class="back-link">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    Wróć
+</a>
+
+<!-- Mountain background -->
+<div class="bg-mountains">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#fff" d="M0,400 L0,280 L120,180 L200,240 L320,100 L420,200 L520,120 L600,180 L720,40 L820,160 L920,80 L1020,180 L1120,100 L1220,200 L1320,130 L1440,220 L1440,400 Z"/>
+        <path fill="#fff" opacity="0.5" d="M0,400 L0,320 L100,260 L180,300 L280,220 L380,280 L480,200 L560,260 L680,180 L760,240 L860,160 L960,240 L1060,180 L1160,260 L1260,200 L1360,270 L1440,240 L1440,400 Z"/>
+    </svg>
 </div>
 
-<!-- Access Denied -->
-<div id="auth-gate" style="display:none;">
-    <div class="gate-card">
-        <div class="gate-icon">🔒</div>
-        <div class="gate-title">BRAK DOSTĘPU</div>
-        <div class="gate-sub" style="margin-bottom:24px;">Ten panel jest tylko dla właściciela.</div>
-        <a href="index.html" style="color:#fff;font-size:12px;letter-spacing:1px;">← Wróć do sklepu</a>
-    </div>
-</div>
+<div class="checkout-wrap">
 
-<!-- App -->
-<div id="app">
-    <!-- Stały przycisk powrotu - prawy górny róg -->
-    <a href="index.html" style="
-        position: fixed;
-        top: 24px;
-        right: 32px;
-        z-index: 500;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 20px;
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 14px;
-        color: #888;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        text-decoration: none;
-        transition: all 0.2s;
-        backdrop-filter: blur(10px);
-    " onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='#888';this.style.borderColor='rgba(255,255,255,0.1)'">
-        <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;flex-shrink:0;">
-            <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
-        </svg>
-        Sklep
-    </a>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <a href="index.html" class="sidebar-logo" style="text-decoration:none;color:inherit;">
-            <div class="logo-icon">
-                <svg viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L20 8.5v.01L12 13 4 8.51 12 4.18zM4 10.18l8 4.5v6.14L4 16.32V10.18zm10 10.64v-6.14l8-4.5v6.14l-8 4.5z"/></svg>
+    <!-- LEFT: Order summary -->
+    <div class="card" id="order-summary">
+        <div class="order-label">Twoje zamówienie</div>
+        <div class="order-product">
+            <div class="order-icon dark" id="summary-icon">
+                <svg viewBox="0 0 24 24"><path d="M6 2l-4 4 4 4 4-4-4-4zm6.5 7C11.12 9 10 10.12 10 11.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5S13.88 9 12.5 9zM17 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/></svg>
             </div>
-            <span class="logo-text">LITESTORE</span>
-            <span class="logo-badge">OWNER</span>
-        </a>
+            <div>
+                <div class="order-type" id="summary-type">PAKIET ROBUX</div>
+                <div class="order-name" id="summary-name">1 000 ROBUX</div>
+            </div>
+        </div>
+        <div class="divider-line"></div>
+        <div class="price-row">
+            <span class="price-row-label">Produkt</span>
+            <span class="price-row-val" id="summary-price-sub">33,00 zł</span>
+        </div>
+        <div class="price-row">
+            <span class="price-row-label">Dostawa</span>
+            <span class="price-row-val" style="color:#22c55e;">GRATIS</span>
+        </div>
+        <div class="divider-line"></div>
+        <div class="price-total">
+            <span class="price-total-label">RAZEM</span>
+            <span class="price-total-val" id="summary-price-total">33,00 zł</span>
+        </div>
+        <div class="trust-badges">
+            <div class="trust-badge">
+                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                Bezpieczna transakcja
+            </div>
+            <div class="trust-badge">
+                <svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+                Dostawa do 6 godzin
+            </div>
+            <div class="trust-badge">
+                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+                Wsparcie 24/7
+            </div>
+        </div>
+    </div>
 
-        <nav class="sidebar-nav">
-            <button class="nav-item active" onclick="showPage('overview')">
-                <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-                Przegląd
-            </button>
-            <button class="nav-item" onclick="showPage('orders')">
-                <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                Zamówienia
-            </button>
-            <button class="nav-item" onclick="showPage('customers')">
-                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                Klienci
-            </button>
-            <button class="nav-item" onclick="showPage('visits')">
-                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-                Wejścia
-            </button>
-            <button class="nav-item" onclick="showPage('add-order')">
-                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                Dodaj zamówienie
-            </button>
-        </nav>
+    <!-- RIGHT: Payment form -->
+    <div class="card">
+        <div class="form-label-top">Płatność</div>
 
-        <div class="sidebar-footer">
-            <div class="owner-info">
-                <div class="owner-avatar">T</div>
-                <div>
-                    <div class="owner-name">Tymoteusz</div>
-                    <div class="owner-role">WŁAŚCICIEL</div>
+        <!-- Steps indicator — 4 kroki -->
+        <div class="steps">
+            <div class="step active" id="step1"><div class="step-num">1</div>Metoda</div>
+            <div class="step" id="step2"><div class="step-num">2</div>Płatność</div>
+            <div class="step" id="step3"><div class="step-num">3</div>Gamepass</div>
+            <div class="step" id="step4"><div class="step-num">4</div>Dane</div>
+        </div>
+
+        <!-- PAGE 1: Wybór metody -->
+        <div class="checkout-page active" id="page-method">
+            <div class="method-grid">
+                <div class="method-card" id="method-blik" onclick="selectMethod('blik')">
+                    <div class="method-icon-svg">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14zm-4.2-5.78v1.75l3.2-2.99L12.8 9v1.7c-3.11.43-4.35 2.56-4.8 4.7 1.11-1.47 2.88-2.44 4.8-2.18z"/></svg>
+                    </div>
+                    <div class="method-name">BLIK</div>
+                    <div class="method-sub">Przelew na numer</div>
+                </div>
+                <div class="method-card" id="method-ltc" onclick="selectMethod('ltc')">
+                    <div class="method-icon-svg">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+                    </div>
+                    <div class="method-name">Litecoin</div>
+                    <div class="method-sub">Krypto LTC</div>
                 </div>
             </div>
-            <a href="index.html" style="
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                padding: 12px 14px;
-                background: rgba(255,255,255,0.05);
+            <p id="error-msg"></p>
+            <button class="btn-main" onclick="goToPayment()">DALEJ →</button>
+        </div>
+
+        <!-- PAGE 2a: BLIK -->
+        <div class="checkout-page" id="page-blik">
+            <div class="blik-box">
+                <div class="blik-title">Przelew BLIK na numer</div>
+                <div class="blik-number">690 178 013</div>
+                <div class="blik-amount">Kwota: <strong id="blik-amount-val">33,00 zł</strong></div>
+                <div class="blik-steps">
+                    <div class="blik-step">
+                        <div class="blik-step-num">1</div>
+                        <span>Otwórz swoją aplikację bankową i wybierz <strong>BLIK → Przelew na numer telefonu</strong></span>
+                    </div>
+                    <div class="blik-step">
+                        <div class="blik-step-num">2</div>
+                        <span>Wpisz numer <strong>690 178 013</strong> i kwotę <strong id="blik-amount-val2">33,00 zł</strong></span>
+                    </div>
+                    <div class="blik-step">
+                        <div class="blik-step-num">3</div>
+                        <span>W tytule przelewu wpisz swój <strong>nick w Roblox</strong></span>
+                    </div>
+                    <div class="blik-step">
+                        <div class="blik-step-num">4</div>
+                        <span>Po wysłaniu kliknij "Zapłaciłem" poniżej</span>
+                    </div>
+                </div>
+            </div>
+            <div style="
+                background: rgba(239,68,68,0.07);
+                border: 1px solid rgba(239,68,68,0.2);
+                border-radius: 12px;
+                padding: 14px 16px;
+                margin-bottom: 16px;
+                font-size: 12px;
+                color: #f87171;
+                line-height: 1.6;
+            ">
+                ⚠️ <strong>Uwaga:</strong> Podanie nieprawidłowego nicku Roblox lub niepoprawnego linku do Gamepassu spowoduje <strong>anulowanie zamówienia</strong> bez zwrotu środków. Upewnij się że wszystkie dane są poprawne przed kontynuowaniem.
+            </div>
+            <button class="btn-main" onclick="goToGamepass()">ZAPŁACIŁEM ✓</button>
+            <button class="btn-back-step" onclick="goBack(1)">← Zmień metodę</button>
+        </div>
+
+        <!-- PAGE 2b: LTC -->
+        <div class="checkout-page" id="page-ltc">
+            <div class="crypto-box">
+                <div class="crypto-title">Płatność Litecoin (LTC)</div>
+                <div class="crypto-network">⚡ Sieć Litecoin (LTC)</div>
+                <div class="crypto-address-label">Adres portfela</div>
+                <div class="crypto-address">
+                    <span style="word-break:break-all;">LSLVPzskezU8pvh4QPvQhf9G4UBzio4qSP</span>
+                    <button class="copy-btn" onclick="copyAddress()">KOPIUJ</button>
+                </div>
+                <div class="crypto-amount-box">
+                    <span class="crypto-amount-label">Do zapłaty (LTC)</span>
+                    <span class="crypto-amount-val" id="ltc-amount-ltc">
+                        <span style="font-size:12px;color:#555;">pobieranie kursu...</span>
+                    </span>
+                </div>
+                <div class="crypto-amount-box" style="margin-top:-8px;">
+                    <span class="crypto-amount-label">Równowartość PLN</span>
+                    <span style="font-size:14px;color:#888;" id="ltc-amount-pln-display">—</span>
+                </div>
+                <div style="
+                    background: rgba(255,255,255,0.05);
+                    border: 1px solid rgba(255,255,255,0.12);
+                    border-radius: 12px;
+                    padding: 16px 18px;
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: #fff;
+                    line-height: 1.6;
+                    margin-top: 4px;
+                ">
+                    ⚠️ Wyślij <strong>dokładną kwotę</strong> w LTC odpowiadającą cenie w złotych.<br>
+                    <span style="font-size:12px;font-weight:500;color:#888;">Po wysłaniu kliknij "Weryfikuj płatność" — sprawdzimy blockchain automatycznie.</span>
+                </div>
+            </div>
+
+            <!-- Weryfikacja status -->
+            <div id="ltc-verify-status" style="display:none;margin-bottom:16px;padding:14px 18px;border-radius:12px;font-size:13px;font-weight:600;"></div>
+
+            <div style="
+                background: rgba(239,68,68,0.07);
+                border: 1px solid rgba(239,68,68,0.2);
+                border-radius: 12px;
+                padding: 14px 16px;
+                margin-bottom: 16px;
+                font-size: 12px;
+                color: #f87171;
+                line-height: 1.6;
+            ">
+                ⚠️ <strong>Uwaga:</strong> Podanie nieprawidłowego nicku Roblox lub niepoprawnego linku do Gamepassu spowoduje <strong>anulowanie zamówienia</strong> bez zwrotu środków. Upewnij się że wszystkie dane są poprawne przed kontynuowaniem.
+            </div>
+            <button class="btn-main" id="ltc-verify-btn" onclick="verifyLTC()">WERYFIKUJ PŁATNOŚĆ</button>
+            <button class="btn-back-step" onclick="goBack(1)">← Zmień metodę</button>
+        </div>
+
+        <!-- PAGE 3: Gamepass instrukcja -->
+        <div class="checkout-page" id="page-gamepass">
+            <div style="margin-bottom:20px;">
+                <div style="font-size:10px;letter-spacing:2px;color:#555;text-transform:uppercase;font-weight:700;margin-bottom:6px;">KROK 3 Z 4</div>
+                <div style="font-size:18px;font-weight:800;margin-bottom:4px;">Utwórz Gamepass</div>
+                <div style="font-size:13px;color:#666;line-height:1.5;">Musisz stworzyć Gamepass w Roblox na dokładną kwotę <strong id="gamepass-price" style="color:#fff;">33 ROBUX</strong> — to jedyna metoda dostarczenia waluty.</div>
+            </div>
+
+            <!-- Video instrukcja -->
+            <div style="
+                background: rgba(255,255,255,0.03);
                 border: 1px solid rgba(255,255,255,0.08);
-                border-radius: 10px;
-                color: #888;
-                font-size: 10px;
-                font-weight: 700;
-                letter-spacing: 1.5px;
-                text-transform: uppercase;
-                text-decoration: none;
-                transition: all 0.2s;
-            " onmouseover="this.style.background='rgba(255,255,255,0.09)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='#888'">
-                <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;flex-shrink:0;">
-                    <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
-                </svg>
-                Wróć do sklepu
-            </a>
-            <button class="btn-logout" id="logoutBtn">
-                <svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-                Wyloguj się
-            </button>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <main class="main">
-
-        <!-- OVERVIEW PAGE -->
-        <div class="page active" id="page-overview">
-            <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;">
-                <div>
-                    <div class="page-label">PANEL WŁAŚCICIELA</div>
-                    <div class="page-title">Przegląd sklepu</div>
-                </div>
-                <a href="index.html" style="
-                    display:flex;align-items:center;gap:8px;
-                    padding:12px 20px;flex-shrink:0;
-                    background:rgba(255,255,255,0.05);
-                    border:1px solid rgba(255,255,255,0.1);
-                    border-radius:14px;color:#888;
-                    font-size:11px;font-weight:700;letter-spacing:1.5px;
-                    text-transform:uppercase;text-decoration:none;transition:all 0.2s;
-                " onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='#888'">
-                    <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor;">
-                        <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
-                    </svg>
-                    Sklep
-                </a>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon green">
-                        <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                border-radius: 16px;
+                overflow: hidden;
+                margin-bottom: 16px;
+            ">
+                <div style="
+                    display: flex; align-items: center; gap: 12px;
+                    padding: 14px 18px;
+                    border-bottom: 1px solid rgba(255,255,255,0.06);
+                ">
+                    <div style="
+                        width: 32px; height: 32px;
+                        background: rgba(239,68,68,0.15);
+                        border-radius: 8px;
+                        display: flex; align-items: center; justify-content: center;
+                        flex-shrink: 0;
+                    ">
+                        <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#ef4444;"><path d="M21.582,6.186c-0.23-0.86-0.908-1.538-1.768-1.768C18.254,4,12,4,12,4S5.746,4,4.186,4.418 c-0.86,0.23-1.538,0.908-1.768,1.768C2,7.746,2,12,2,12s0,4.254,0.418,5.814c0.23,0.86,0.908,1.538,1.768,1.768 C5.746,20,12,20,12,20s6.254,0,7.814-0.418c0.861-0.23,1.538-0.908,1.768-1.768C22,16.254,22,12,22,12S22,7.746,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"/></svg>
                     </div>
-                    <div class="stat-label">Przychód całkowity</div>
-                    <div class="stat-value" id="stat-revenue">—</div>
-                    <div class="stat-sub" id="stat-revenue-sub">ładowanie...</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon blue">
-                        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                    </div>
-                    <div class="stat-label">Klienci</div>
-                    <div class="stat-value" id="stat-customers">—</div>
-                    <div class="stat-sub" id="stat-customers-sub">ładowanie...</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon orange">
-                        <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                    </div>
-                    <div class="stat-label">Zamówienia ogółem</div>
-                    <div class="stat-value" id="stat-orders-total">—</div>
-                    <div class="stat-sub" id="stat-orders-pending"></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-                    </div>
-                    <div class="stat-label">Wejścia na stronę</div>
-                    <div class="stat-value" id="stat-visits">—</div>
-                    <div class="stat-sub" id="stat-visits-sub">łącznie</div>
-                </div>
-            </div>
-
-            <div class="charts-row">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <div>
-                            <div class="chart-title">Przychody</div>
-                            <div class="chart-sub">Zarobki w ostatnich miesiącach</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrap">
-                        <canvas id="revenueChart"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <div>
-                            <div class="chart-title">Top produkty</div>
-                            <div class="chart-sub">Ilość sprzedanych sztuk</div>
-                        </div>
-                    </div>
-                    <div class="products-list" id="topProductsList">
-                        <div style="color:#444;font-size:12px;text-align:center;padding:20px;">Ładowanie...</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="charts-row" style="grid-template-columns: 1fr 1fr;">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <div>
-                            <div class="chart-title">Zamówienia (ostatnie 7 dni)</div>
-                            <div class="chart-sub">Liczba zamówień dziennie</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrap">
-                        <canvas id="ordersChart"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <div>
-                            <div class="chart-title">Podział produktów</div>
-                            <div class="chart-sub">Robux vs GTA$</div>
-                        </div>
-                    </div>
-                    <div class="chart-wrap" style="display:flex;align-items:center;justify-content:center;">
-                        <canvas id="pieChart" style="max-height:180px;max-width:180px;"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ORDERS PAGE -->
-        <div class="page" id="page-orders">
-            <div class="page-header">
-                <div class="page-label">ZARZĄDZANIE</div>
-                <div class="page-title">Zamówienia</div>
-            </div>
-            <div class="table-card">
-                <div class="table-header">
-                    <div class="table-title">Wszystkie zamówienia</div>
-                    <span class="badge badge-neutral" id="orders-count-badge">0 zamówień</span>
-                </div>
-                <div style="overflow-x:auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Klient</th>
-                                <th>Produkt</th>
-                                <th>Kwota</th>
-                                <th>Data</th>
-                                <th>Gamepass</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="orders-table-body">
-                            <tr><td colspan="5" style="text-align:center;color:#444;padding:40px;">Ładowanie...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- CUSTOMERS PAGE -->
-        <div class="page" id="page-customers">
-            <div class="page-header">
-                <div class="page-label">BAZA DANYCH</div>
-                <div class="page-title">Klienci</div>
-            </div>
-            <div class="table-card">
-                <div class="table-header">
-                    <div class="table-title">Zarejestrowani użytkownicy</div>
-                    <span class="badge badge-neutral" id="customers-count-badge">0 klientów</span>
-                </div>
-                <div style="overflow-x:auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Użytkownik</th>
-                                <th>E-mail</th>
-                                <th>Nick</th>
-                                <th>Zamówienia</th>
-                                <th>Wydał</th>
-                            </tr>
-                        </thead>
-                        <tbody id="customers-table-body">
-                            <tr><td colspan="5" style="text-align:center;color:#444;padding:40px;">Ładowanie...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- VISITS PAGE -->
-        <div class="page" id="page-visits">
-            <div class="page-header">
-                <div class="page-label">ANALITYKA</div>
-                <div class="page-title">Wejścia na stronę</div>
-            </div>
-            <div class="visits-info">
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                <p>Licznik wejść jest zliczany przez Firebase przy każdej wizycie na stronie głównej. Wymaga dodania <strong>skryptu trackującego</strong> do <code>index.html</code> — instrukcja poniżej.</p>
-            </div>
-            <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
-                <div class="stat-card">
-                    <div class="stat-label">Łączne wejścia</div>
-                    <div class="stat-value" id="visit-total">—</div>
-                    <div class="stat-sub">od początku</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Dziś</div>
-                    <div class="stat-value" id="visit-today">—</div>
-                    <div class="stat-sub" id="visit-today-date">—</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Ostatnie 7 dni</div>
-                    <div class="stat-value" id="visit-week">—</div>
-                    <div class="stat-sub">wejść</div>
-                </div>
-            </div>
-            <div class="chart-card" style="margin-top:20px;">
-                <div class="chart-header">
                     <div>
-                        <div class="chart-title">Wejścia — ostatnie 14 dni</div>
-                        <div class="chart-sub">Unikalne sesje dziennie</div>
+                        <div style="font-size:12px;font-weight:700;">Instrukcja video</div>
+                        <div style="font-size:10px;color:#555;">Jak stworzyć Gamepass krok po kroku</div>
                     </div>
                 </div>
-                <div class="chart-wrap">
-                    <canvas id="visitsChart"></canvas>
+                <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+                    <iframe
+                        src="https://www.youtube.com/embed/QcLAt2auH0g"
+                        id="tutorial-video"
+                        style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                    </iframe>
                 </div>
             </div>
-            <div class="table-card" style="margin-top:20px;">
-                <div class="table-title" style="margin-bottom:16px;">Jak dodać śledzenie wejść?</div>
-                <p style="font-size:13px;color:#666;line-height:1.7;">Dodaj ten kod do <code style="color:#aaa;">index.html</code> tuż przed <code style="color:#aaa;">&lt;/body&gt;</code>:</p>
-                <pre style="margin-top:14px;padding:18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;font-size:12px;color:#aaa;overflow-x:auto;line-height:1.8;">&lt;script type="module"&gt;
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, doc, setDoc, getDoc, increment, serverTimestamp }
-    from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  const app = initializeApp({ /* twój firebaseConfig */ });
-  const db = getFirestore(app);
-  const today = new Date().toISOString().split('T')[0];
-
-  // Łączne wejścia
-  await setDoc(doc(db,'analytics','visits'), { total: increment(1) }, { merge: true });
-  // Dzienne
-  await setDoc(doc(db,'analytics','daily'), { [today]: increment(1) }, { merge: true });
-&lt;/script&gt;</pre>
+            <div class="field">
+                <label>Link do Twojego Gamepassu</label>
+                <input type="url" id="gamepass-link" placeholder="https://www.roblox.com/game-pass/123456/nazwa">
+                <div class="field-hint">Stwórz Gamepass → skopiuj link i wklej tutaj</div>
             </div>
+            <p id="error-gamepass" style="font-size:12px;color:#ef4444;margin-bottom:12px;min-height:16px;"></p>
+            <button class="btn-main" onclick="goToRobloxForm()">DALEJ →</button>
+            <button class="btn-back-step" onclick="goBack(2)">← Wróć do płatności</button>
         </div>
 
-        <!-- ADD ORDER PAGE -->
-        <div class="page" id="page-add-order">
-            <div class="page-header">
-                <div class="page-label">ZARZĄDZANIE</div>
-                <div class="page-title">Dodaj zamówienie</div>
+        <!-- PAGE 4: Dane klienta -->
+        <div class="checkout-page" id="page-roblox">
+            <div class="field">
+                <label>Nick w Roblox</label>
+                <input type="text" id="roblox-nick" placeholder="TwójNick123">
             </div>
-            <div class="table-card">
-                <div class="table-title" style="margin-bottom:24px;">Nowe zamówienie klienta</div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Email klienta</label>
-                        <input class="form-input" id="fo-email" type="email" placeholder="klient@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Nick klienta</label>
-                        <input class="form-input" id="fo-nick" type="text" placeholder="nick w grze">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Produkt</label>
-                        <select class="form-select" id="fo-product">
-                            <option value="10M GTA$|gta|39">10M GTA$ — 39 zł</option>
-                            <option value="50M GTA$|gta|99">50M GTA$ — 99 zł</option>
-                            <option value="200M GTA$|gta|279">200M GTA$ — 279 zł</option>
-                            <option value="300 ROBUX|robux|10">300 ROBUX — 10 zł</option>
-                            <option value="1 000 ROBUX|robux|33">1 000 ROBUX — 33 zł</option>
-                            <option value="3 500 ROBUX|robux|116">3 500 ROBUX — 116 zł</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Status</label>
-                        <select class="form-select" id="fo-status">
-                            <option value="pending">W realizacji</option>
-                            <option value="delivered">Dostarczono</option>
-                        </select>
-                    </div>
-                    <div class="form-group full">
-                        <label class="form-label">Notatka (opcjonalnie)</label>
-                        <input class="form-input" id="fo-note" type="text" placeholder="np. zapłacił przez BLIK">
-                    </div>
-                </div>
-                <button class="btn-submit" id="addOrderBtn">DODAJ ZAMÓWIENIE</button>
-                <div class="form-success" id="form-success">✓ Zamówienie zostało dodane do Firebase!</div>
+            <div class="field">
+                <label>E-mail kontaktowy (opcjonalnie)</label>
+                <input type="email" id="contact-email" placeholder="twoj@email.com">
+                <div class="field-hint">Prześlemy potwierdzenie gdy dostarczymy Robux</div>
             </div>
+            <label class="confirm-row">
+                <input type="checkbox" id="confirm-check">
+                <span>Potwierdzam że dokonałem/am płatności i podane dane są prawidłowe</span>
+            </label>
+            <p id="error-msg2"></p>
+            <button class="btn-main" onclick="submitOrder()">WYŚLIJ ZAMÓWIENIE</button>
+            <button class="btn-back-step" onclick="goBack(3)">← Wróć</button>
         </div>
 
-    </main>
+        <!-- PAGE 4: Sukces -->
+        <div class="checkout-page" id="page-success">
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+            <div class="success-title">Zamówienie przyjęte!</div>
+            <div class="success-sub">Dostarczymy Robux na Twój profil w ciągu <strong style="color:#fff;">do 6 godzin</strong>. Dostaniesz zaproszenie do grupy Roblox.</div>
+            <div class="success-info">
+                <div class="success-info-row">
+                    <span class="success-info-label">Produkt</span>
+                    <span class="success-info-val" id="success-product">1 000 ROBUX</span>
+                </div>
+                <div class="success-info-row">
+                    <span class="success-info-label">Metoda płatności</span>
+                    <span class="success-info-val" id="success-method">BLIK</span>
+                </div>
+                <div class="success-info-row">
+                    <span class="success-info-label">Nick Roblox</span>
+                    <span class="success-info-val" id="success-nick">—</span>
+                </div>
+                <div class="success-info-row">
+                    <span class="success-info-label">Status</span>
+                    <span class="success-info-val" style="color:#f97316;">⏳ Oczekuje na weryfikację</span>
+                </div>
+            </div>
+            <a href="index.html" class="btn-main" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">WRÓĆ DO SKLEPU</a>
+        </div>
+
+    </div>
 </div>
 
-<!-- Firebase -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import {
-        getFirestore,
-        collection, getDocs, addDoc,
-        doc, setDoc, getDoc, updateDoc, arrayUnion,
-        increment, serverTimestamp, query, orderBy, limit
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    const OWNER_EMAIL = "plackowypotworhwdp2137@gmail.com";
+    import { getFirestore, addDoc, getDoc, setDoc, collection, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDD3Z98au_WMwaawKi3lFJsycC0GCdW0jQ",
@@ -943,390 +651,299 @@
         messagingSenderId: "7091718515313",
         appId: "1:7091718515313:web:87fdad9a266aa88edd320e"
     };
-
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ── Auth gate ──
-    onAuthStateChanged(auth, async (user) => {
-        document.getElementById('loading-gate').style.display = 'none';
-
-        if (!user || user.email !== OWNER_EMAIL) {
-            document.getElementById('auth-gate').style.display = 'flex';
-            return;
-        }
-
-        document.getElementById('app').style.display = 'block';
-        await loadAll();
-    });
-
-    // ── Logout ──
-    document.getElementById('logoutBtn').onclick = () => {
-        signOut(auth).then(() => window.location.href = 'login.html');
+    // Sprawdź czy hash tx już był użyty
+    window._checkTxHash = async (txHash) => {
+        const snap = await getDoc(doc(db, 'used_transactions', txHash));
+        return snap.exists(); // true = już użyty
     };
 
-    // ── Page switcher ──
-    window.showPage = (name) => {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById('page-' + name).classList.add('active');
-        event.currentTarget.classList.add('active');
+    // Zarejestruj hash tx jako użyty
+    window._markTxHash = async (txHash) => {
+        await setDoc(doc(db, 'used_transactions', txHash), {
+            usedAt: serverTimestamp()
+        });
     };
 
-    // ── Load all data ──
-    async function loadAll() {
-        const [ordersSnap, usersSnap, analyticsSnap, dailySnap] = await Promise.all([
-            getDocs(collection(db, 'orders')),
-            getDocs(collection(db, 'users')),
-            getDoc(doc(db, 'analytics', 'visits')),
-            getDoc(doc(db, 'analytics', 'daily')),
-        ]);
-
-        const orders = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-        const users  = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-        renderStats(orders, users, analyticsSnap, dailySnap);
-        renderCharts(orders, dailySnap);
-        renderOrdersTable(orders, users);
-        renderCustomersTable(users, orders);
-        renderVisits(analyticsSnap, dailySnap);
-        renderTopProducts(orders);
-    }
-
-    // ── Stats ──
-    function renderStats(orders, users, analyticsSnap, dailySnap) {
-        const totalRevenue = orders.reduce((s, o) => s + (o.price || 0), 0);
-        const pending = orders.filter(o => o.status === 'pending').length;
-        const totalVisits = analyticsSnap.exists() ? (analyticsSnap.data().total || 0) : 0;
-
-        document.getElementById('stat-revenue').textContent = totalRevenue.toFixed(0) + ' zł';
-        document.getElementById('stat-revenue-sub').textContent = orders.length + ' transakcji';
-        document.getElementById('stat-customers').textContent = users.length;
-        document.getElementById('stat-customers-sub').textContent = 'zarejestrowanych';
-        document.getElementById('stat-orders-total').textContent = orders.length;
-        document.getElementById('stat-orders-pending').textContent = pending > 0 ? `⚠ ${pending} w realizacji` : '✓ brak oczekujących';
-        document.getElementById('stat-orders-pending').className = 'stat-sub ' + (pending > 0 ? 'down' : 'up');
-        document.getElementById('stat-visits').textContent = totalVisits.toLocaleString('pl');
-    }
-
-    // ── Charts ──
-    function renderCharts(orders, dailySnap) {
-        const chartDefaults = {
-            color: 'rgba(255,255,255,0.5)',
-            borderColor: 'rgba(255,255,255,0.1)',
-        };
-        Chart.defaults.color = '#555';
-
-        // Revenue by month
-        const months = ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'];
-        const revenueByMonth = Array(12).fill(0);
-        orders.forEach(o => {
-            if (o.createdAt?.toDate) {
-                const m = o.createdAt.toDate().getMonth();
-                revenueByMonth[m] += (o.price || 0);
-            }
+    // Zapisz zamówienie
+    window._submitOrderFirebase = async (productName, productType, productPrice, productGame, selectedMethod, link, nick, email, txHash) => {
+        await addDoc(collection(db, 'orders'), {
+            title: productName,
+            type: productType,
+            game: productGame,
+            price: parseFloat(productPrice.replace(' zł','').replace(',','.')),
+            paymentMethod: selectedMethod === 'blik' ? 'BLIK' : 'Litecoin (LTC)',
+            gamepassLink: link,
+            clientNick: nick,
+            clientEmail: email || null,
+            ltcTxHash: txHash || null,
+            status: 'pending',
+            createdAt: serverTimestamp()
         });
-        const currentMonth = new Date().getMonth();
-        const last6months = [];
-        const last6labels = [];
-        for (let i = 5; i >= 0; i--) {
-            const idx = (currentMonth - i + 12) % 12;
-            last6months.push(revenueByMonth[idx]);
-            last6labels.push(months[idx]);
-        }
 
-        new Chart(document.getElementById('revenueChart'), {
-            type: 'line',
-            data: {
-                labels: last6labels,
-                datasets: [{
-                    label: 'Przychód (zł)',
-                    data: last6months,
-                    borderColor: 'rgba(255,255,255,0.8)',
-                    backgroundColor: 'rgba(255,255,255,0.04)',
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#fff',
-                    pointRadius: 4,
+        // Discord webhook
+        const webhookUrl = 'https://discord.com/api/webhooks/1473394614705852508/-VmT2gRIz597mh0-FqA0xfK0a-i5wX5jD7-WHXttdOhiOoDZJsZueMD9ODx6rY-2LFxY';
+        const method = selectedMethod === 'blik' ? 'BLIK' : 'Litecoin (LTC)';
+        const gameLabel = productGame === 'robux' ? '🟥 Roblox' : '🟨 GTA V';
+
+        await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: 'LiteStore',
+                avatar_url: 'https://cdn.discordapp.com/embed/avatars/0.png',
+                embeds: [{
+                    title: '🛒 Nowe zamówienie!',
+                    color: 0xf97316,
+                    fields: [
+                        { name: '📦 Produkt', value: `**${productName}**\n${productType}`, inline: true },
+                        { name: '🎮 Gra', value: gameLabel, inline: true },
+                        { name: '💰 Kwota', value: `**${productPrice}**`, inline: true },
+                        { name: '💳 Metoda płatności', value: method, inline: true },
+                        { name: '👤 Nick Roblox', value: nick || '—', inline: true },
+                        { name: '📧 Email', value: email || '—', inline: true },
+                        { name: '🎫 Gamepass', value: link ? `[Kliknij tutaj](${link})` : '—', inline: false },
+                        ...(txHash ? [{ name: '🔗 TX Hash (LTC)', value: `\`${txHash}\``, inline: false }] : []),
+                    ],
+                    footer: { text: 'LiteStore • Status: ⏳ Oczekuje na realizację' },
+                    timestamp: new Date().toISOString()
                 }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555' } },
-                    y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555', callback: v => v + ' zł' } }
-                }
-            }
-        });
-
-        // Orders last 7 days
-        const last7 = [];
-        const last7labels = [];
-        for (let i = 6; i >= 0; i--) {
-            const d = new Date(); d.setDate(d.getDate() - i);
-            const key = d.toISOString().split('T')[0];
-            last7labels.push(d.toLocaleDateString('pl', { weekday: 'short' }));
-            const count = orders.filter(o => {
-                if (!o.createdAt?.toDate) return false;
-                return o.createdAt.toDate().toISOString().split('T')[0] === key;
-            }).length;
-            last7.push(count);
-        }
-
-        new Chart(document.getElementById('ordersChart'), {
-            type: 'bar',
-            data: {
-                labels: last7labels,
-                datasets: [{
-                    data: last7,
-                    backgroundColor: 'rgba(255,255,255,0.12)',
-                    borderColor: 'rgba(255,255,255,0.3)',
-                    borderWidth: 1,
-                    borderRadius: 6,
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555' } },
-                    y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555', stepSize: 1 } }
-                }
-            }
-        });
-
-        // Pie chart
-        const robuxCount = orders.filter(o => o.game === 'robux').length;
-        const gtaCount   = orders.filter(o => o.game === 'gta').length;
-        const other      = orders.length - robuxCount - gtaCount;
-        new Chart(document.getElementById('pieChart'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Robux', 'GTA$', 'Inne'],
-                datasets: [{
-                    data: [robuxCount, gtaCount, other],
-                    backgroundColor: ['rgba(168,85,247,0.7)', 'rgba(59,130,246,0.7)', 'rgba(255,255,255,0.15)'],
-                    borderColor: ['rgba(168,85,247,1)', 'rgba(59,130,246,1)', 'rgba(255,255,255,0.3)'],
-                    borderWidth: 1,
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#555', font: { size: 11 }, padding: 12 } }
-                }
-            }
-        });
-
-        // Visits chart
-        const dailyData = dailySnap.exists() ? dailySnap.data() : {};
-        const last14 = [], last14labels = [];
-        for (let i = 13; i >= 0; i--) {
-            const d = new Date(); d.setDate(d.getDate() - i);
-            const key = d.toISOString().split('T')[0];
-            last14.push(dailyData[key] || 0);
-            last14labels.push(d.toLocaleDateString('pl', { day: 'numeric', month: 'short' }));
-        }
-        new Chart(document.getElementById('visitsChart'), {
-            type: 'line',
-            data: {
-                labels: last14labels,
-                datasets: [{
-                    label: 'Wejścia',
-                    data: last14,
-                    borderColor: 'rgba(59,130,246,0.8)',
-                    backgroundColor: 'rgba(59,130,246,0.08)',
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#3b82f6',
-                    pointRadius: 3,
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555' } },
-                    y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#555', stepSize: 1 } }
-                }
-            }
-        });
-    }
-
-    // ── Orders table ──
-    function renderOrdersTable(orders, users) {
-        document.getElementById('orders-count-badge').textContent = orders.length + ' zamówień';
-        const body = document.getElementById('orders-table-body');
-        if (orders.length === 0) {
-            body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#444;padding:40px;">Brak zamówień</td></tr>';
-            return;
-        }
-        const sorted = [...orders].sort((a,b) => {
-            const ta = a.createdAt?.toDate?.() || 0;
-            const tb = b.createdAt?.toDate?.() || 0;
-            return tb - ta;
-        });
-        body.innerHTML = sorted.map(o => {
-            const user = users.find(u => u.id === o.userId) || {};
-            const nick = user.nick || user.displayName || o.clientNick || '—';
-            const email = user.email || o.clientEmail || '—';
-            const initials = nick.substring(0,2).toUpperCase();
-            const date = o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString('pl') : (o.date || '—');
-            const price = typeof o.price === 'number' ? o.price.toFixed(2).replace('.',',') + ' zł' : '—';
-            const isDelivered = o.status === 'delivered';
-            const dotClass = o.game === 'robux' ? 'dot-robux' : 'dot-gta';
-            const gpLink = o.gamepassLink
-                ? `<a href="${o.gamepassLink}" target="_blank" style="color:#a855f7;font-size:12px;font-weight:700;text-decoration:none;padding:4px 10px;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);border-radius:8px;">🎮 Otwórz</a>`
-                : '<span style="color:#333;font-size:11px;">brak</span>';
-            const completeBtn = isDelivered
-                ? `<span class="badge badge-delivered">Dostarczono</span>`
-                : `<span class="badge badge-pending" style="cursor:pointer;" onclick="markDelivered('${o.id}', '${o.userId || ''}', '${o.clientNick || ''}', '${o.title || ''}', '${o.game || ''}', ${o.price || 0})">W realizacji — kliknij ✓</span>`;
-            return `<tr>
-                <td><div class="user-cell"><div class="user-avatar-sm">${initials}</div><div><div style="font-weight:700;font-size:13px;">${nick}</div><div style="font-size:11px;color:#555;">${email}</div></div></div></td>
-                <td><div class="product-cell"><div class="product-dot ${dotClass}"></div>${o.title || '—'}</div></td>
-                <td style="font-weight:700;">${price}</td>
-                <td style="color:#666;">${date}</td>
-                <td>${gpLink}</td>
-                <td>${completeBtn}</td>
-            </tr>`;
-        }).join('');
-    }
-
-    // ── Customers table ──
-    function renderCustomersTable(users, orders) {
-        document.getElementById('customers-count-badge').textContent = users.length + ' klientów';
-        const body = document.getElementById('customers-table-body');
-        if (users.length === 0) {
-            body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#444;padding:40px;">Brak klientów</td></tr>';
-            return;
-        }
-        body.innerHTML = users.map(u => {
-            const userOrders = orders.filter(o => o.userId === u.id);
-            const spent = userOrders.reduce((s,o) => s+(o.price||0),0);
-            const initials = (u.nick || u.email || '?').substring(0,2).toUpperCase();
-            return `<tr>
-                <td><div class="user-cell"><div class="user-avatar-sm">${initials}</div><div style="font-weight:700;font-size:13px;">${u.nick || u.displayName || '—'}</div></div></td>
-                <td style="color:#666;font-size:12px;">${u.email || '—'}</td>
-                <td style="color:#888;">${u.nick || '—'}</td>
-                <td style="font-weight:700;">${userOrders.length}</td>
-                <td style="font-weight:700;color:#22c55e;">${spent.toFixed(2).replace('.',',')} zł</td>
-            </tr>`;
-        }).join('');
-    }
-
-    // ── Visits page ──
-    function renderVisits(analyticsSnap, dailySnap) {
-        const total = analyticsSnap.exists() ? (analyticsSnap.data().total || 0) : 0;
-        const dailyData = dailySnap.exists() ? dailySnap.data() : {};
-        const today = new Date().toISOString().split('T')[0];
-        const todayCount = dailyData[today] || 0;
-        let weekCount = 0;
-        for (let i = 0; i < 7; i++) {
-            const d = new Date(); d.setDate(d.getDate() - i);
-            weekCount += dailyData[d.toISOString().split('T')[0]] || 0;
-        }
-        document.getElementById('visit-total').textContent = total.toLocaleString('pl');
-        document.getElementById('visit-today').textContent = todayCount;
-        document.getElementById('visit-today-date').textContent = new Date().toLocaleDateString('pl');
-        document.getElementById('visit-week').textContent = weekCount;
-        document.getElementById('stat-visits').textContent = total.toLocaleString('pl');
-        document.getElementById('stat-visits-sub').textContent = 'łącznie';
-    }
-
-    // ── Top products ──
-    function renderTopProducts(orders) {
-        const counts = {};
-        orders.forEach(o => { counts[o.title] = (counts[o.title]||0) + 1; });
-        const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        const max = sorted[0]?.[1] || 1;
-        const el = document.getElementById('topProductsList');
-        if (sorted.length === 0) {
-            el.innerHTML = '<div style="color:#444;font-size:12px;text-align:center;padding:20px;">Brak danych</div>';
-            return;
-        }
-        el.innerHTML = sorted.map(([name, count], i) => `
-            <div class="product-row">
-                <div class="product-rank">#${i+1}</div>
-                <div class="product-info">
-                    <div class="product-name-sm">${name}</div>
-                    <div class="product-bar-wrap">
-                        <div class="product-bar" style="width:${(count/max*100).toFixed(0)}%"></div>
-                    </div>
-                </div>
-                <div class="product-count">${count}x</div>
-            </div>
-        `).join('');
-    }
-
-    // ── Add order ──
-    document.getElementById('addOrderBtn').onclick = async () => {
-        const email   = document.getElementById('fo-email').value.trim();
-        const nick    = document.getElementById('fo-nick').value.trim();
-        const productVal = document.getElementById('fo-product').value;
-        const status  = document.getElementById('fo-status').value;
-        const note    = document.getElementById('fo-note').value.trim();
-        const btn     = document.getElementById('addOrderBtn');
-
-        if (!email || !nick) { alert('Wypełnij email i nick klienta.'); return; }
-
-        const [title, game, priceStr] = productVal.split('|');
-        const price = parseFloat(priceStr);
-
-        btn.textContent = 'ZAPISYWANIE...';
-        btn.disabled = true;
-
-        try {
-            await addDoc(collection(db, 'orders'), {
-                clientEmail: email,
-                clientNick: nick,
-                title, game, price, status, note,
-                createdAt: serverTimestamp(),
-                createdByOwner: true
-            });
-            document.getElementById('form-success').style.display = 'block';
-            document.getElementById('fo-email').value = '';
-            document.getElementById('fo-nick').value = '';
-            document.getElementById('fo-note').value = '';
-            setTimeout(() => document.getElementById('form-success').style.display='none', 3000);
-        } catch(e) {
-            alert('Błąd: ' + e.message);
-        }
-
-        btn.textContent = 'DODAJ ZAMÓWIENIE';
-        btn.disabled = false;
-    };
-
-    // ── Mark order as delivered ──
-    window.markDelivered = async function(orderId, userId, clientNick, title, game, price) {
-        if (!confirm(`Oznaczyć "${title}" jako dostarczone?`)) return;
-        try {
-            // Update order status in orders collection
-            await updateDoc(doc(db, 'orders', orderId), { status: 'delivered' });
-
-            // Also update in user's zamowienia array if userId exists
-            if (userId) {
-                const userRef = doc(db, 'users', userId);
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    const userData = userSnap.data();
-                    const zamowienia = (userData.zamowienia || []).map(z => {
-                        if (z.title === title && z.status === 'pending') {
-                            return { ...z, status: 'delivered' };
-                        }
-                        return z;
-                    });
-                    await updateDoc(userRef, { zamowienia });
-                }
-            }
-
-            alert('Zamówienie oznaczone jako dostarczone!');
-            location.reload();
-        } catch(e) {
-            alert('Błąd: ' + e.message);
-        }
+            })
+        }).catch(() => {}); // nie blokuj zamówienia jeśli webhook padnie
     };
 </script>
+
+<script>
+    // ── State ──
+    var selectedMethod = null;
+    var expectedLTC    = null;
+    var verifiedTxHash = null;
+    var LTC_ADDRESS    = 'LSLVPzskezU8pvh4QPvQhf9G4UBzio4qSP';
+
+    // ── URL params ──
+    var params = new URLSearchParams(window.location.search);
+    var productName  = params.get('product') || '1 000 ROBUX';
+    var productType  = params.get('type')    || 'PAKIET ROBUX';
+    var productPrice = params.get('price')   || '33,00 zł';
+    var productGame  = params.get('game')    || 'robux';
+    var productRobux = params.get('robux') ? parseInt(params.get('robux')) : null;
+
+    // ── Fill summary ──
+    document.getElementById('summary-name').textContent         = productName;
+    document.getElementById('summary-type').textContent         = productType;
+    document.getElementById('summary-price-sub').textContent    = productPrice;
+    document.getElementById('summary-price-total').textContent  = productPrice;
+    document.getElementById('blik-amount-val').textContent      = productPrice;
+    document.getElementById('blik-amount-val2').textContent     = productPrice;
+    document.getElementById('success-product').textContent      = productName;
+    document.title = 'LITESTORE \u2014 ' + productName;
+
+    if (productGame === 'robux') {
+        document.getElementById('summary-icon').innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 2l-4 4 4 4 4-4-4-4zm6.5 7C11.12 9 10 10.12 10 11.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5S13.88 9 12.5 9zM17 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/></svg>';
+        document.getElementById('summary-icon').className = 'order-icon dark';
+    }
+
+    // ── Helpers ──
+    function setPage(id) {
+        document.querySelectorAll('.checkout-page').forEach(function(p) { p.classList.remove('active'); });
+        document.getElementById(id).classList.add('active');
+    }
+
+    function setStep(n) {
+        for (var i = 1; i <= 4; i++) {
+            var el = document.getElementById('step' + i);
+            if (!el) continue;
+            el.classList.remove('active', 'done');
+            if (i < n) el.classList.add('done');
+            else if (i === n) el.classList.add('active');
+        }
+    }
+
+    function showLTCStatus(type, msg) {
+        var el = document.getElementById('ltc-verify-status');
+        el.style.display = 'block';
+        el.textContent = msg;
+        var styles = {
+            success: ['rgba(34,197,94,0.1)',  '1px solid rgba(34,197,94,0.25)',  '#22c55e'],
+            error:   ['rgba(239,68,68,0.08)', '1px solid rgba(239,68,68,0.2)',   '#ef4444'],
+            info:    ['rgba(255,255,255,0.05)','1px solid rgba(255,255,255,0.1)', '#888']
+        };
+        var s = styles[type] || styles.info;
+        el.style.background = s[0]; el.style.border = s[1]; el.style.color = s[2];
+    }
+
+    // ── Method select ──
+    window.selectMethod = function(m) {
+        selectedMethod = m;
+        document.getElementById('method-blik').classList.toggle('selected', m === 'blik');
+        document.getElementById('method-ltc').classList.toggle('selected',  m === 'ltc');
+        document.getElementById('error-msg').textContent = '';
+    };
+
+    // ── Step 1 → 2 ──
+    window.goToPayment = function() {
+        if (!selectedMethod) {
+            document.getElementById('error-msg').textContent = 'Wybierz metodę płatności.';
+            return;
+        }
+        setPage(selectedMethod === 'blik' ? 'page-blik' : 'page-ltc');
+        setStep(2);
+        if (selectedMethod === 'ltc') fetchLTCRate();
+    };
+
+    // ── Step 2 → 3 (Gamepass) ──
+    window.goToGamepass = function() {
+        var robuxPrice = productRobux || parseInt(productName.replace(/\D/g, '')) || 1000;
+        document.getElementById('gamepass-price').textContent = robuxPrice + ' ROBUX';
+        setPage('page-gamepass');
+        setStep(3);
+    };
+
+    // ── Step 3 → 4 ──
+    window.goToRobloxForm = function() {
+        var link = document.getElementById('gamepass-link').value.trim();
+        var err  = document.getElementById('error-gamepass');
+        if (!link) { err.textContent = 'Podaj link do Gamepassu.'; return; }
+        if (!link.includes('roblox.com')) { err.textContent = 'Link musi prowadzić do roblox.com'; return; }
+        err.textContent = '';
+        setPage('page-roblox');
+        setStep(4);
+    };
+
+    // ── Back ──
+    window.goBack = function(toStep) {
+        if (toStep === 1) { setPage('page-method');   setStep(1); }
+        if (toStep === 2) { setPage(selectedMethod === 'blik' ? 'page-blik' : 'page-ltc'); setStep(2); }
+        if (toStep === 3) { setPage('page-gamepass'); setStep(3); }
+    };
+
+    // ── Copy LTC address ──
+    window.copyAddress = function() {
+        navigator.clipboard.writeText(LTC_ADDRESS);
+        var btn = document.querySelector('.copy-btn');
+        btn.textContent = 'SKOPIOWANO!';
+        btn.style.color = '#22c55e';
+        setTimeout(function() { btn.textContent = 'KOPIUJ'; btn.style.color = ''; }, 2000);
+    };
+
+
+    // ── Fetch LTC rate (przez Netlify Function — brak problemów z CORS) ──
+    function fetchLTCRate() {
+        fetch('/api/ltc-rate')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data.PLN) throw new Error('Brak danych');
+                var ltcPln  = parseFloat(data.PLN);
+                var pln     = parseFloat(productPrice.replace(' zł','').replace(',','.'));
+                expectedLTC = pln / ltcPln;
+                document.getElementById('ltc-amount-ltc').textContent         = expectedLTC.toFixed(6) + ' LTC';
+                document.getElementById('ltc-amount-pln-display').textContent = productPrice;
+            })
+            .catch(function(e) {
+                console.error('LTC rate error:', e);
+                document.getElementById('ltc-amount-ltc').innerHTML =
+                    '<span style="color:#ef4444;font-size:12px;cursor:pointer;" onclick="retryLTCRate()">❌ Błąd kursu — kliknij aby spróbować ponownie</span>';
+            });
+    }
+
+    window.retryLTCRate = function() {
+        document.getElementById('ltc-amount-ltc').innerHTML = '<span style="color:#555;font-size:12px;">pobieranie kursu...</span>';
+        fetchLTCRate();
+    };
+
+    // ── Verify LTC on-chain ──
+    window.verifyLTC = function() {
+        var btn = document.getElementById('ltc-verify-btn');
+        if (!expectedLTC) { showLTCStatus('error', '⏳ Poczekaj — pobieramy kurs LTC.'); return; }
+        btn.textContent = 'SPRAWDZANIE...';
+        btn.disabled = true;
+        showLTCStatus('info', '🔍 Sprawdzamy blockchain Litecoin...');
+
+        fetch('https://api.blockcypher.com/v1/ltc/main/addrs/' + LTC_ADDRESS + '/full?limit=10')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data.txs || data.txs.length === 0) {
+                    showLTCStatus('error', '❌ Nie wykryto transakcji. Upewnij się że wysłałeś LTC i spróbuj za chwilę.');
+                    btn.textContent = 'WERYFIKUJ PONOWNIE'; btn.disabled = false; return;
+                }
+                var now       = Date.now();
+                var limit     = 30 * 60 * 1000;
+                var tolerance = 0.002;
+                var match     = null;
+
+                for (var i = 0; i < data.txs.length; i++) {
+                    var tx  = data.txs[i];
+                    var age = now - new Date(tx.received).getTime();
+                    if (age > limit) continue;
+                    for (var j = 0; j < tx.outputs.length; j++) {
+                        var out = tx.outputs[j];
+                        if (!out.addresses || out.addresses.indexOf(LTC_ADDRESS) === -1) continue;
+                        var received = out.value / 1e8;
+                        if (Math.abs(received - expectedLTC) <= tolerance) { match = tx; break; }
+                    }
+                    if (match) break;
+                }
+
+                if (!match) {
+                    showLTCStatus('error', '❌ Nie wykryto płatności ' + expectedLTC.toFixed(6) + ' LTC w ciągu 30 min. Sprawdź kwotę i spróbuj ponownie.');
+                    btn.textContent = 'WERYFIKUJ PONOWNIE'; btn.disabled = false;
+                    return;
+                }
+
+                // Sprawdź czy ten tx hash był już użyty
+                var txHash = match.hash;
+                window._checkTxHash(txHash).then(function(alreadyUsed) {
+                    if (alreadyUsed) {
+                        showLTCStatus('error', '❌ Ta transakcja została już wykorzystana do innego zamówienia.');
+                        btn.textContent = 'WERYFIKUJ PONOWNIE'; btn.disabled = false;
+                        return;
+                    }
+                    // Hash wolny — oznacz jako użyty i przepuść
+                    window._markTxHash(txHash).then(function() {
+                        verifiedTxHash = txHash;
+                        showLTCStatus('success', '✅ Płatność zweryfikowana! Możesz przejść dalej.');
+                        btn.textContent = 'ZWERYFIKOWANO ✓';
+                        btn.style.background = '#22c55e'; btn.style.color = '#000';
+                btn.onclick = window.goToGamepass;
+                        btn.disabled = false;
+                    });
+                });
+            })
+            .catch(function() {
+                showLTCStatus('error', '⚠️ Błąd połączenia z blockchain. Spróbuj za chwilę.');
+                btn.textContent = 'WERYFIKUJ PŁATNOŚĆ'; btn.disabled = false;
+            });
+    };
+
+    // ── Submit order ──
+    window.submitOrder = function() {
+        var gamepass  = document.getElementById('gamepass-link').value.trim();
+        var nick      = document.getElementById('roblox-nick').value.trim();
+        var email     = document.getElementById('contact-email').value.trim();
+        var confirmed = document.getElementById('confirm-check').checked;
+        var err       = document.getElementById('error-msg2');
+
+        if (!nick)      { err.textContent = 'Podaj nick w Roblox.'; return; }
+        if (!confirmed) { err.textContent = 'Potwierdź że dokonałeś płatności.'; return; }
+
+        err.textContent = '';
+        var btn = document.querySelector('#page-roblox .btn-main');
+        btn.textContent = 'WYSYŁANIE...'; btn.disabled = true;
+
+        window._submitOrderFirebase(productName, productType, productPrice, productGame, selectedMethod, gamepass, nick, email, verifiedTxHash)
+            .then(function() {
+                document.getElementById('success-method').textContent = selectedMethod === 'blik' ? 'BLIK' : 'Litecoin (LTC)';
+                document.getElementById('success-nick').textContent   = nick;
+                setPage('page-success'); setStep(5);
+            })
+            .catch(function() {
+                err.textContent = 'Błąd wysyłania. Spróbuj ponownie.';
+                btn.textContent = 'WYŚLIJ ZAMÓWIENIE'; btn.disabled = false;
+            });
+    };
+</script>
+
 </body>
 </html>
