@@ -18,6 +18,22 @@
             padding: 24px;
         }
 
+        /* Mountain background */
+        .bg-mountains {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-mountains svg {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 70%;
+            opacity: 0.07;
+        }
+
         body::before {
             content: '';
             position: fixed;
@@ -26,6 +42,7 @@
                 radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 70%),
                 radial-gradient(ellipse 40% 40% at 80% 80%, rgba(255,255,255,0.02) 0%, transparent 60%);
             pointer-events: none;
+            z-index: 0;
         }
 
         /* Back link */
@@ -162,6 +179,14 @@
         .method-card:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
         .method-card.selected { border-color: #fff; background: rgba(255,255,255,0.07); }
         .method-icon { font-size: 28px; margin-bottom: 10px; }
+        .method-icon-svg {
+            width: 48px; height: 48px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 12px;
+        }
+        .method-icon-svg svg { width: 26px; height: 26px; fill: #fff; }
         .method-name { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
         .method-sub { font-size: 10px; color: #555; letter-spacing: 1px; }
 
@@ -325,6 +350,14 @@
     Wróć
 </a>
 
+<!-- Mountain background -->
+<div class="bg-mountains">
+    <svg viewBox="0 0 1440 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#fff" d="M0,400 L0,280 L120,180 L200,240 L320,100 L420,200 L520,120 L600,180 L720,40 L820,160 L920,80 L1020,180 L1120,100 L1220,200 L1320,130 L1440,220 L1440,400 Z"/>
+        <path fill="#fff" opacity="0.5" d="M0,400 L0,320 L100,260 L180,300 L280,220 L380,280 L480,200 L560,260 L680,180 L760,240 L860,160 L960,240 L1060,180 L1160,260 L1260,200 L1360,270 L1440,240 L1440,400 Z"/>
+    </svg>
+</div>
+
 <div class="checkout-wrap">
 
     <!-- LEFT: Order summary -->
@@ -373,32 +406,28 @@
     <div class="card">
         <div class="form-label-top">Płatność</div>
 
-        <!-- Steps indicator -->
+        <!-- Steps indicator — 4 kroki -->
         <div class="steps">
-            <div class="step active" id="step1">
-                <div class="step-num">1</div>
-                Metoda
-            </div>
-            <div class="step" id="step2">
-                <div class="step-num">2</div>
-                Płatność
-            </div>
-            <div class="step" id="step3">
-                <div class="step-num">3</div>
-                Link
-            </div>
+            <div class="step active" id="step1"><div class="step-num">1</div>Metoda</div>
+            <div class="step" id="step2"><div class="step-num">2</div>Płatność</div>
+            <div class="step" id="step3"><div class="step-num">3</div>Gamepass</div>
+            <div class="step" id="step4"><div class="step-num">4</div>Dane</div>
         </div>
 
         <!-- PAGE 1: Wybór metody -->
         <div class="checkout-page active" id="page-method">
             <div class="method-grid">
                 <div class="method-card" id="method-blik" onclick="selectMethod('blik')">
-                    <div class="method-icon">📱</div>
+                    <div class="method-icon-svg">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14zm-4.2-5.78v1.75l3.2-2.99L12.8 9v1.7c-3.11.43-4.35 2.56-4.8 4.7 1.11-1.47 2.88-2.44 4.8-2.18z"/></svg>
+                    </div>
                     <div class="method-name">BLIK</div>
                     <div class="method-sub">Przelew na numer</div>
                 </div>
                 <div class="method-card" id="method-ltc" onclick="selectMethod('ltc')">
-                    <div class="method-icon">🪙</div>
+                    <div class="method-icon-svg">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+                    </div>
                     <div class="method-name">Litecoin</div>
                     <div class="method-sub">Krypto LTC</div>
                 </div>
@@ -424,11 +453,15 @@
                     </div>
                     <div class="blik-step">
                         <div class="blik-step-num">3</div>
+                        <span>W tytule przelewu wpisz swój <strong>nick w Roblox</strong></span>
+                    </div>
+                    <div class="blik-step">
+                        <div class="blik-step-num">4</div>
                         <span>Po wysłaniu kliknij "Zapłaciłem" poniżej</span>
                     </div>
                 </div>
             </div>
-            <button class="btn-main" onclick="goToRobloxForm()">ZAPŁACIŁEM ✓</button>
+            <button class="btn-main" onclick="goToGamepass()">ZAPŁACIŁEM ✓</button>
             <button class="btn-back-step" onclick="goBack(1)">← Zmień metodę</button>
         </div>
 
@@ -475,13 +508,73 @@
             <button class="btn-back-step" onclick="goBack(1)">← Zmień metodę</button>
         </div>
 
-        <!-- PAGE 3: Link Roblox -->
-        <div class="checkout-page" id="page-roblox">
-            <div class="field">
-                <label>Twój link do profilu Roblox</label>
-                <input type="url" id="roblox-link" placeholder="https://www.roblox.com/users/123456789/profile">
-                <div class="field-hint">Wejdź na swój profil Roblox → skopiuj link z paska adresu</div>
+        <!-- PAGE 3: Gamepass instrukcja -->
+        <div class="checkout-page" id="page-gamepass">
+            <div style="margin-bottom:20px;">
+                <div style="font-size:10px;letter-spacing:2px;color:#555;text-transform:uppercase;font-weight:700;margin-bottom:6px;">KROK 3 Z 4</div>
+                <div style="font-size:18px;font-weight:800;margin-bottom:4px;">Utwórz Gamepass</div>
+                <div style="font-size:13px;color:#666;line-height:1.5;">Musisz stworzyć Gamepass w Roblox na dokładną kwotę <strong id="gamepass-price" style="color:#fff;">33 ROBUX</strong> — to jedyna metoda dostarczenia waluty.</div>
             </div>
+
+            <!-- Video instrukcja -->
+            <div style="
+                background: rgba(255,255,255,0.03);
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 16px;
+                overflow: hidden;
+                margin-bottom: 16px;
+            ">
+                <div style="
+                    display: flex; align-items: center; gap: 12px;
+                    padding: 14px 18px;
+                    border-bottom: 1px solid rgba(255,255,255,0.06);
+                ">
+                    <div style="
+                        width: 32px; height: 32px;
+                        background: rgba(239,68,68,0.15);
+                        border-radius: 8px;
+                        display: flex; align-items: center; justify-content: center;
+                        flex-shrink: 0;
+                    ">
+                        <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#ef4444;"><path d="M21.582,6.186c-0.23-0.86-0.908-1.538-1.768-1.768C18.254,4,12,4,12,4S5.746,4,4.186,4.418 c-0.86,0.23-1.538,0.908-1.768,1.768C2,7.746,2,12,2,12s0,4.254,0.418,5.814c0.23,0.86,0.908,1.538,1.768,1.768 C5.746,20,12,20,12,20s6.254,0,7.814-0.418c0.861-0.23,1.538-0.908,1.768-1.768C22,16.254,22,12,22,12S22,7.746,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"/></svg>
+                    </div>
+                    <div>
+                        <div style="font-size:12px;font-weight:700;">Instrukcja video</div>
+                        <div style="font-size:10px;color:#555;">Jak stworzyć Gamepass krok po kroku</div>
+                    </div>
+                </div>
+                <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+                    <iframe
+                        src=""
+                        id="tutorial-video"
+                        style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                    </iframe>
+                    <div id="video-placeholder" style="
+                        position:absolute;inset:0;
+                        display:flex;flex-direction:column;align-items:center;justify-content:center;
+                        background:rgba(0,0,0,0.3);
+                        color:#444;font-size:13px;gap:12px;
+                    ">
+                        <svg viewBox="0 0 24 24" style="width:40px;height:40px;fill:#333;"><path d="M21.582,6.186c-0.23-0.86-0.908-1.538-1.768-1.768C18.254,4,12,4,12,4S5.746,4,4.186,4.418 c-0.86,0.23-1.538,0.908-1.768,1.768C2,7.746,2,12,2,12s0,4.254,0.418,5.814c0.23,0.86,0.908,1.538,1.768,1.768 C5.746,20,12,20,12,20s6.254,0,7.814-0.418c0.861-0.23,1.538-0.908,1.768-1.768C22,16.254,22,12,22,12S22,7.746,21.582,6.186z M10,15.464V8.536L16,12L10,15.464z"/></svg>
+                        Video instrukcja wkrótce
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Link do Twojego Gamepassu</label>
+                <input type="url" id="gamepass-link" placeholder="https://www.roblox.com/game-pass/123456/nazwa">
+                <div class="field-hint">Stwórz Gamepass → skopiuj link i wklej tutaj</div>
+            </div>
+            <p id="error-gamepass" style="font-size:12px;color:#ef4444;margin-bottom:12px;min-height:16px;"></p>
+            <button class="btn-main" onclick="goToRobloxForm()">DALEJ →</button>
+            <button class="btn-back-step" onclick="goBack(2)">← Wróć do płatności</button>
+        </div>
+
+        <!-- PAGE 4: Dane klienta -->
+        <div class="checkout-page" id="page-roblox">
             <div class="field">
                 <label>Nick w Roblox</label>
                 <input type="text" id="roblox-nick" placeholder="TwójNick123">
@@ -497,7 +590,7 @@
             </label>
             <p id="error-msg2"></p>
             <button class="btn-main" onclick="submitOrder()">WYŚLIJ ZAMÓWIENIE</button>
-            <button class="btn-back-step" onclick="goBack(2)">← Wróć do płatności</button>
+            <button class="btn-back-step" onclick="goBack(3)">← Wróć</button>
         </div>
 
         <!-- PAGE 4: Sukces -->
@@ -533,7 +626,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, addDoc, getDoc, setDoc, collection, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDD3Z98au_WMwaawKi3lFJsycC0GCdW0jQ",
@@ -546,17 +639,31 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Expose submitOrder to window (needs Firebase)
-    window._submitOrderFirebase = async (productName, productType, productPrice, productGame, selectedMethod, link, nick, email) => {
+    // Sprawdź czy hash tx już był użyty
+    window._checkTxHash = async (txHash) => {
+        const snap = await getDoc(doc(db, 'used_transactions', txHash));
+        return snap.exists(); // true = już użyty
+    };
+
+    // Zarejestruj hash tx jako użyty
+    window._markTxHash = async (txHash) => {
+        await setDoc(doc(db, 'used_transactions', txHash), {
+            usedAt: serverTimestamp()
+        });
+    };
+
+    // Zapisz zamówienie
+    window._submitOrderFirebase = async (productName, productType, productPrice, productGame, selectedMethod, link, nick, email, txHash) => {
         await addDoc(collection(db, 'orders'), {
             title: productName,
             type: productType,
             game: productGame,
             price: parseFloat(productPrice.replace(' zł','').replace(',','.')),
             paymentMethod: selectedMethod === 'blik' ? 'BLIK' : 'Litecoin (LTC)',
-            robloxLink: link,
+            gamepassLink: link,
             clientNick: nick,
             clientEmail: email || null,
+            ltcTxHash: txHash || null,
             status: 'pending',
             createdAt: serverTimestamp()
         });
@@ -566,8 +673,9 @@
 <script>
     // ── State ──
     var selectedMethod = null;
-    var expectedLTC = null;
-    var LTC_ADDRESS = 'LSLVPzskezU8pvh4QPvQhf9G4UBzio4qSP';
+    var expectedLTC    = null;
+    var verifiedTxHash = null;
+    var LTC_ADDRESS    = 'LSLVPzskezU8pvh4QPvQhf9G4UBzio4qSP';
 
     // ── URL params ──
     var params = new URLSearchParams(window.location.search);
@@ -598,8 +706,9 @@
     }
 
     function setStep(n) {
-        for (var i = 1; i <= 3; i++) {
+        for (var i = 1; i <= 4; i++) {
             var el = document.getElementById('step' + i);
+            if (!el) continue;
             el.classList.remove('active', 'done');
             if (i < n) el.classList.add('done');
             else if (i === n) el.classList.add('active');
@@ -638,16 +747,32 @@
         if (selectedMethod === 'ltc') fetchLTCRate();
     };
 
-    // ── Step 2 → 3 ──
-    window.goToRobloxForm = function() {
-        setPage('page-roblox');
+    // ── Step 2 → 3 (Gamepass) ──
+    window.goToGamepass = function() {
+        // Ustaw cenę w ROBUX dla gamepassu
+        var pln = parseFloat(productPrice.replace(' zł','').replace(',','.'));
+        var robuxPrice = Math.round(pln * 1.43); // ~1 PLN = 1.43 ROBUX (Roblox exchange rate)
+        document.getElementById('gamepass-price').textContent = robuxPrice + ' ROBUX';
+        setPage('page-gamepass');
         setStep(3);
+    };
+
+    // ── Step 3 → 4 ──
+    window.goToRobloxForm = function() {
+        var link = document.getElementById('gamepass-link').value.trim();
+        var err  = document.getElementById('error-gamepass');
+        if (!link) { err.textContent = 'Podaj link do Gamepassu.'; return; }
+        if (!link.includes('roblox.com')) { err.textContent = 'Link musi prowadzić do roblox.com'; return; }
+        err.textContent = '';
+        setPage('page-roblox');
+        setStep(4);
     };
 
     // ── Back ──
     window.goBack = function(toStep) {
-        if (toStep === 1) { setPage('page-method'); setStep(1); }
+        if (toStep === 1) { setPage('page-method');   setStep(1); }
         if (toStep === 2) { setPage(selectedMethod === 'blik' ? 'page-blik' : 'page-ltc'); setStep(2); }
+        if (toStep === 3) { setPage('page-gamepass'); setStep(3); }
     };
 
     // ── Copy LTC address ──
@@ -660,27 +785,29 @@
     };
 
 
-    // ── Fetch LTC rate (Binance public API — brak CORS blokady) ──
+    // ── Fetch LTC rate (przez Netlify Function — brak problemów z CORS) ──
     function fetchLTCRate() {
-        // Binance: LTC/USDT price, potem stały przelicznik USDT≈PLN z NBP
-        Promise.all([
-            fetch('https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT').then(function(r){ return r.json(); }),
-            fetch('https://api.nbp.pl/api/exchangerates/rates/a/usd/?format=json').then(function(r){ return r.json(); })
-        ])
-        .then(function(results) {
-            var ltcUsdt = parseFloat(results[0].price);
-            var usdPln  = parseFloat(results[1].rates[0].mid);
-            var ltcPln  = ltcUsdt * usdPln;
-            var pln     = parseFloat(productPrice.replace(' zł','').replace(',','.'));
-            expectedLTC = pln / ltcPln;
-            document.getElementById('ltc-amount-ltc').textContent        = expectedLTC.toFixed(6) + ' LTC';
-            document.getElementById('ltc-amount-pln-display').textContent = productPrice;
-        })
-        .catch(function(e) {
-            document.getElementById('ltc-amount-ltc').innerHTML = '<span style="color:#ef4444;font-size:12px;">Błąd pobierania kursu — odśwież stronę</span>';
-            console.error('LTC rate error:', e);
-        });
+        fetch('/api/ltc-rate')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data.PLN) throw new Error('Brak danych');
+                var ltcPln  = parseFloat(data.PLN);
+                var pln     = parseFloat(productPrice.replace(' zł','').replace(',','.'));
+                expectedLTC = pln / ltcPln;
+                document.getElementById('ltc-amount-ltc').textContent         = expectedLTC.toFixed(6) + ' LTC';
+                document.getElementById('ltc-amount-pln-display').textContent = productPrice;
+            })
+            .catch(function(e) {
+                console.error('LTC rate error:', e);
+                document.getElementById('ltc-amount-ltc').innerHTML =
+                    '<span style="color:#ef4444;font-size:12px;cursor:pointer;" onclick="retryLTCRate()">❌ Błąd kursu — kliknij aby spróbować ponownie</span>';
+            });
     }
+
+    window.retryLTCRate = function() {
+        document.getElementById('ltc-amount-ltc').innerHTML = '<span style="color:#555;font-size:12px;">pobieranie kursu...</span>';
+        fetchLTCRate();
+    };
 
     // ── Verify LTC on-chain ──
     window.verifyLTC = function() {
@@ -697,10 +824,11 @@
                     showLTCStatus('error', '❌ Nie wykryto transakcji. Upewnij się że wysłałeś LTC i spróbuj za chwilę.');
                     btn.textContent = 'WERYFIKUJ PONOWNIE'; btn.disabled = false; return;
                 }
-                var now      = Date.now();
-                var limit    = 30 * 60 * 1000;
+                var now       = Date.now();
+                var limit     = 30 * 60 * 1000;
                 var tolerance = 0.002;
-                var match = null;
+                var match     = null;
+
                 for (var i = 0; i < data.txs.length; i++) {
                     var tx  = data.txs[i];
                     var age = now - new Date(tx.received).getTime();
@@ -713,16 +841,31 @@
                     }
                     if (match) break;
                 }
-                if (match) {
-                    showLTCStatus('success', '✅ Płatność zweryfikowana! Możesz przejść dalej.');
-                    btn.textContent = 'ZWERYFIKOWANO ✓';
-                    btn.style.background = '#22c55e'; btn.style.color = '#000';
-                    btn.onclick = window.goToRobloxForm;
-                    btn.disabled = false;
-                } else {
+
+                if (!match) {
                     showLTCStatus('error', '❌ Nie wykryto płatności ' + expectedLTC.toFixed(6) + ' LTC w ciągu 30 min. Sprawdź kwotę i spróbuj ponownie.');
                     btn.textContent = 'WERYFIKUJ PONOWNIE'; btn.disabled = false;
+                    return;
                 }
+
+                // Sprawdź czy ten tx hash był już użyty
+                var txHash = match.hash;
+                window._checkTxHash(txHash).then(function(alreadyUsed) {
+                    if (alreadyUsed) {
+                        showLTCStatus('error', '❌ Ta transakcja została już wykorzystana do innego zamówienia.');
+                        btn.textContent = 'WERYFIKUJ PONOWNIE'; btn.disabled = false;
+                        return;
+                    }
+                    // Hash wolny — oznacz jako użyty i przepuść
+                    window._markTxHash(txHash).then(function() {
+                        verifiedTxHash = txHash;
+                        showLTCStatus('success', '✅ Płatność zweryfikowana! Możesz przejść dalej.');
+                        btn.textContent = 'ZWERYFIKOWANO ✓';
+                        btn.style.background = '#22c55e'; btn.style.color = '#000';
+                btn.onclick = window.goToGamepass;
+                        btn.disabled = false;
+                    });
+                });
             })
             .catch(function() {
                 showLTCStatus('error', '⚠️ Błąd połączenia z blockchain. Spróbuj za chwilę.');
@@ -732,26 +875,24 @@
 
     // ── Submit order ──
     window.submitOrder = function() {
-        var link      = document.getElementById('roblox-link').value.trim();
+        var gamepass  = document.getElementById('gamepass-link').value.trim();
         var nick      = document.getElementById('roblox-nick').value.trim();
         var email     = document.getElementById('contact-email').value.trim();
         var confirmed = document.getElementById('confirm-check').checked;
         var err       = document.getElementById('error-msg2');
 
-        if (!link)                      { err.textContent = 'Podaj link do profilu Roblox.'; return; }
-        if (!nick)                      { err.textContent = 'Podaj nick w Roblox.'; return; }
-        if (!confirmed)                 { err.textContent = 'Potwierdź że dokonałeś płatności.'; return; }
-        if (!link.includes('roblox.com')){ err.textContent = 'Link musi prowadzić do roblox.com'; return; }
+        if (!nick)      { err.textContent = 'Podaj nick w Roblox.'; return; }
+        if (!confirmed) { err.textContent = 'Potwierdź że dokonałeś płatności.'; return; }
 
         err.textContent = '';
         var btn = document.querySelector('#page-roblox .btn-main');
         btn.textContent = 'WYSYŁANIE...'; btn.disabled = true;
 
-        window._submitOrderFirebase(productName, productType, productPrice, productGame, selectedMethod, link, nick, email)
+        window._submitOrderFirebase(productName, productType, productPrice, productGame, selectedMethod, gamepass, nick, email, verifiedTxHash)
             .then(function() {
                 document.getElementById('success-method').textContent = selectedMethod === 'blik' ? 'BLIK' : 'Litecoin (LTC)';
                 document.getElementById('success-nick').textContent   = nick;
-                setPage('page-success'); setStep(3);
+                setPage('page-success'); setStep(5);
             })
             .catch(function() {
                 err.textContent = 'Błąd wysyłania. Spróbuj ponownie.';
@@ -762,3 +903,4 @@
 
 </body>
 </html>
+
