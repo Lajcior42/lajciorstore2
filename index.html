@@ -504,16 +504,15 @@
         .product-card.popular::after {
             content: 'POPULARNE';
             position: absolute;
-            top: 18px;
-            right: 18px;
-            background: linear-gradient(135deg, #f97316, #ef4444);
+            top: 22px;
+            right: 22px;
+            background: #111;
             color: #fff;
-            padding: 5px 12px;
-            border-radius: 6px;
+            padding: 7px 16px;
+            border-radius: 14px;
             font-size: 9px;
             font-weight: 800;
-            letter-spacing: 2px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            letter-spacing: 1.5px;
         }
 
         .product-icon {
@@ -1121,46 +1120,6 @@
             margin-bottom: 20px;
             font-size: 18px;
             font-weight: 800;
-        }
-
-        .best-deal-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: linear-gradient(135deg, #f97316, #ef4444);
-            color: #fff;
-            font-size: 9px;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            text-transform: uppercase;
-        }
-
-        .product-card.best-deal {
-            border-color: rgba(249,115,22,0.35);
-            box-shadow: 0 0 30px rgba(249,115,22,0.08);
-            transform: scale(1.03);
-        }
-
-        .product-card.best-deal:hover {
-            transform: scale(1.05);
-            border-color: rgba(249,115,22,0.55);
-        }
-
-        .btn-ghost {
-            background: rgba(255,255,255,0.12);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-        .btn-ghost:hover {
-            background: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.3);
-        }
-        .product-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
         }
 
         #checkoutBtn:disabled {
@@ -1828,44 +1787,40 @@
                 </div>
 
                 <!-- ROBUX Products -->
-                <!-- Robux SVG icon macro -->
                 <div class="product-card">
                     <div class="product-icon dark">
-                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;fill:#fff;">
-                            <path d="M50 4 L90 27 L90 73 L50 96 L10 73 L10 27 Z"/><path d="M50 19 L77 35 L77 65 L50 81 L23 65 L23 35 Z" fill="#111"/><rect x="37" y="37" width="26" height="26" rx="3"/>
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 2l-4 4 4 4 4-4-4-4zm6.5 7C11.12 9 10 10.12 10 11.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5S13.88 9 12.5 9zM17 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
                         </svg>
                     </div>
                     <div class="product-type">PAKIET ROBUX</div>
                     <div class="product-name">300 ROBUX</div>
                     <div class="product-price">10,00 zł</div>
                     <div class="product-actions">
-                        <button class="btn btn-ghost btn-full" onclick="addToCart('300 ROBUX', 'PAKIET ROBUX', 10.00)">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                            DODAJ DO KOSZYKA
-                        </button>
-                        <button class="btn btn-secondary btn-full" onclick="buyNow('300 ROBUX', 'PAKIET ROBUX', '10,00 zł', 'robux', 300)">
+                        <button class="btn btn-secondary btn-full">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                            </svg>
                             KUP TERAZ
                         </button>
                     </div>
                     <div class="more-dots">• • •</div>
                 </div>
 
-                <div class="product-card popular best-deal">
-                    <div class="best-deal-badge">⭐ BEST DEAL</div>
-                    <div class="product-icon" style="width:64px;height:64px;border-radius:16px;">
-                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:34px;height:34px;fill:#000;">
-                            <path d="M50 4 L90 27 L90 73 L50 96 L10 73 L10 27 Z"/><path d="M50 19 L77 35 L77 65 L50 81 L23 65 L23 35 Z" fill="#fff"/><rect x="37" y="37" width="26" height="26" rx="3"/>
+                <div class="product-card popular">
+                    <div class="product-icon">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 2l-4 4 4 4 4-4-4-4zm6.5 7C11.12 9 10 10.12 10 11.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5S13.88 9 12.5 9zM17 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
                         </svg>
                     </div>
                     <div class="product-type">PAKIET ROBUX</div>
-                    <div class="product-name" style="font-size:30px;">1 000 ROBUX</div>
-                    <div class="product-price" style="font-size:17px;">33,00 zł</div>
+                    <div class="product-name">1 000 ROBUX</div>
+                    <div class="product-price">33,00 zł</div>
                     <div class="product-actions">
-                        <button class="btn btn-ghost btn-full" onclick="addToCart('1 000 ROBUX', 'PAKIET ROBUX', 33.00)">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                            DODAJ DO KOSZYKA
-                        </button>
-                        <button class="btn btn-secondary btn-full" onclick="buyNow('1 000 ROBUX', 'PAKIET ROBUX', '33,00 zł', 'robux', 1000)">
+                        <button class="btn btn-primary btn-full">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                            </svg>
                             KUP TERAZ
                         </button>
                     </div>
@@ -1874,19 +1829,18 @@
 
                 <div class="product-card">
                     <div class="product-icon dark">
-                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;fill:#fff;">
-                            <path d="M50 4 L90 27 L90 73 L50 96 L10 73 L10 27 Z"/><path d="M50 19 L77 35 L77 65 L50 81 L23 65 L23 35 Z" fill="#111"/><rect x="37" y="37" width="26" height="26" rx="3"/>
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 2l-4 4 4 4 4-4-4-4zm6.5 7C11.12 9 10 10.12 10 11.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5S13.88 9 12.5 9zM17 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
                         </svg>
                     </div>
                     <div class="product-type">PAKIET ROBUX</div>
                     <div class="product-name">3 500 ROBUX</div>
                     <div class="product-price">116,00 zł</div>
                     <div class="product-actions">
-                        <button class="btn btn-ghost btn-full" onclick="addToCart('3 500 ROBUX', 'PAKIET ROBUX', 116.00)">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
-                            DODAJ DO KOSZYKA
-                        </button>
-                        <button class="btn btn-secondary btn-full" onclick="buyNow('3 500 ROBUX', 'PAKIET ROBUX', '116,00 zł', 'robux', 3500)">
+                        <button class="btn btn-secondary btn-full">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                            </svg>
                             KUP TERAZ
                         </button>
                     </div>
@@ -2227,17 +2181,12 @@
             document.body.style.overflow = 'auto';
         }
 
-        function buyNow(name, type, price, game, robux) {
-            const params = new URLSearchParams({ product: name, type, price, game, robux: robux || '' });
-            window.location.href = 'checkout.html?' + params.toString();
-        }
-
         function addToCart(name, type, price) {
             const item = {
                 id: Date.now(),
                 name: name,
                 type: type,
-                price: typeof price === 'number' ? price : parseFloat(price.replace(' zł', '').replace(',', '.'))
+                price: parseFloat(price.replace(' zł', '').replace(',', '.'))
             };
             
             cart.push(item);
@@ -2315,8 +2264,23 @@
         }
 
         // Add to cart buttons
-        // Checkout button from cart — redirect first item to checkout
         document.addEventListener('DOMContentLoaded', () => {
+            const productCards = document.querySelectorAll('.product-card');
+            productCards.forEach(card => {
+                if (card.classList.contains('out-of-stock')) return;
+                const button = card.querySelector('.btn');
+                const name = card.querySelector('.product-name').textContent.trim();
+                const type = card.querySelector('.product-type').textContent.trim();
+                const price = card.querySelector('.product-price').textContent.trim();
+                const game = type.includes('ROBUX') ? 'robux' : 'gta';
+
+                button.onclick = () => {
+                    const params = new URLSearchParams({ product: name, type, price, game });
+                    window.location.href = 'checkout.html?' + params.toString();
+                };
+            });
+
+            // Checkout button from cart — redirect first item to checkout
             document.getElementById('checkoutBtn').onclick = () => {
                 if (cart.length === 0) return;
                 const item = cart[0];
@@ -2493,5 +2457,25 @@
             });
         })();
     </script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, increment, serverTimestamp }
+        from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDD3Z98au_WMwaawKi3lFJsycC0GCdW0jQ",
+        authDomain: "lajciorstore.firebaseapp.com",
+        projectId: "lajciorstore",
+        storageBucket: "lajciorstore.firebasestorage.app",
+        messagingSenderId: "7091718515313",
+        appId: "1:7091718515313:web:87fdad9a266aa88edd320e"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const today = new Date().toISOString().split('T')[0];
+
+    await setDoc(doc(db, 'analytics', 'visits'), { total: increment(1) }, { merge: true });
+    await setDoc(doc(db, 'analytics', 'daily'), { [today]: increment(1) }, { merge: true });
+</script>
 </body>
 </html>
