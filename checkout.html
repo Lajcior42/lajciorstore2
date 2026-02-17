@@ -750,7 +750,7 @@
 
     // ── Step 2 → 3 (Gamepass) ──
     window.goToGamepass = function() {
-        var robuxPrice = productRobux || Math.round(parseFloat(productPrice.replace(' zł','').replace(',','.')) * 1.43);
+        var robuxPrice = productRobux || parseInt(productName.replace(/\D/g, '')) || 1000;
         document.getElementById('gamepass-price').textContent = robuxPrice + ' ROBUX';
         setPage('page-gamepass');
         setStep(3);
@@ -902,5 +902,3 @@
 
 </body>
 </html>
-
-
