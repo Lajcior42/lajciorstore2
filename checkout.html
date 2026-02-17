@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LITESTORE — Płatność</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #111;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 80% 80%, rgba(255,255,255,0.02) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        /* Back link */
+        .back-link {
+            position: fixed;
+            top: 28px; left: 28px;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 11px; font-weight: 700; letter-spacing: 2px;
+            color: #444; text-decoration: none; text-transform: uppercase;
+            transition: color 0.2s; z-index: 10;
+        }
+        .back-link:hover { color: #fff; }
+        .back-link svg { width: 16px; height: 16px; fill: currentColor; }
+
+        /* Layout */
+        .checkout-wrap {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 860px;
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* Card base */
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 12%; right: 12%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+        }
+
+        /* Order summary */
+        .order-label {
+            font-size: 9px; letter-spacing: 3px; color: #555;
+            text-transform: uppercase; font-weight: 700; margin-bottom: 20px;
+        }
+        .order-product {
+            display: flex; align-items: center; gap: 16px; margin-bottom: 28px;
+        }
+        .order-icon {
+            width: 56px; height: 56px;
+            background: #fff; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .order-icon svg { width: 28px; height: 28px; fill: #000; }
+        .order-icon.dark { background: rgba(255,255,255,0.1); }
+        .order-icon.dark svg { fill: #fff; }
+        .order-type { font-size: 10px; color: #555; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+        .order-name { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+        .divider-line {
+            height: 1px; background: rgba(255,255,255,0.06); margin: 20px 0;
+        }
+        .price-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px;
+        }
+        .price-row-label { font-size: 12px; color: #555; }
+        .price-row-val { font-size: 12px; color: #888; }
+        .price-total {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 16px;
+        }
+        .price-total-label { font-size: 13px; font-weight: 700; letter-spacing: 1px; }
+        .price-total-val { font-size: 26px; font-weight: 900; letter-spacing: -0.5px; }
+
+        .trust-badges {
+            display: flex; flex-direction: column; gap: 10px; margin-top: 24px;
+        }
+        .trust-badge {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 11px; color: #444;
+        }
+        .trust-badge svg { width: 14px; height: 14px; fill: #444; flex-shrink: 0; }
+
+        /* Payment form */
+        .form-label-top {
+            font-size: 9px; letter-spacing: 3px; color: #555;
+            text-transform: uppercase; font-weight: 700; margin-bottom: 20px;
+        }
+
+        /* Steps */
+        .steps {
+            display: flex; gap: 0; margin-bottom: 28px;
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px; overflow: hidden;
+        }
+        .step {
+            flex: 1; padding: 12px 8px; text-align: center;
+            font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; color: #444;
+            background: transparent;
+            border-right: 1px solid rgba(255,255,255,0.07);
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+        .step:last-child { border-right: none; }
+        .step.active { color: #fff; background: rgba(255,255,255,0.06); }
+        .step.done { color: #22c55e; }
+        .step-num {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            font-size: 10px; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .step.active .step-num { background: #fff; color: #000; }
+        .step.done .step-num { background: #22c55e; color: #000; }
+
+        /* Pages */
+        .checkout-page { display: none; }
+        .checkout-page.active { display: block; }
+
+        /* Method select */
+        .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .method-card {
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: 16px; padding: 20px 16px;
+            cursor: pointer; transition: all 0.2s;
+            background: rgba(255,255,255,0.02);
+            text-align: center;
+        }
+        .method-card:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
+        .method-card.selected { border-color: #fff; background: rgba(255,255,255,0.07); }
+        .method-icon { font-size: 28px; margin-bottom: 10px; }
+        .method-name { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
+        .method-sub { font-size: 10px; color: #555; letter-spacing: 1px; }
+
+        /* BLIK details */
+        .blik-box {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px; padding: 24px;
+            margin-bottom: 20px;
+        }
+        .blik-title {
+            font-size: 11px; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; color: #888; margin-bottom: 16px;
+        }
+        .blik-number {
+            font-size: 32px; font-weight: 900; letter-spacing: 4px;
+            margin-bottom: 8px; font-variant-numeric: tabular-nums;
+        }
+        .blik-amount {
+            font-size: 13px; color: #555; margin-bottom: 20px;
+        }
+        .blik-steps { display: flex; flex-direction: column; gap: 10px; }
+        .blik-step {
+            display: flex; align-items: flex-start; gap: 12px;
+            font-size: 13px; color: #888; line-height: 1.4;
+        }
+        .blik-step-num {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            font-size: 10px; font-weight: 800; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-top: 1px;
+        }
+
+        /* Crypto details */
+        .crypto-box {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px; padding: 24px;
+            margin-bottom: 20px;
+        }
+        .crypto-title {
+            font-size: 11px; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; color: #888; margin-bottom: 16px;
+        }
+        .crypto-network {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.2);
+            color: #a855f7; font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+            padding: 5px 12px; border-radius: 8px; margin-bottom: 14px;
+            text-transform: uppercase;
+        }
+        .crypto-address-label { font-size: 10px; color: #555; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+        .crypto-address {
+            font-size: 11px; font-family: monospace;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; padding: 12px 14px;
+            word-break: break-all; color: #ccc; line-height: 1.6;
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            margin-bottom: 14px;
+        }
+        .copy-btn {
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; padding: 6px 10px; color: #888;
+            font-size: 10px; font-weight: 700; letter-spacing: 1px;
+            cursor: pointer; flex-shrink: 0; transition: all 0.2s;
+            text-transform: uppercase;
+        }
+        .copy-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .crypto-amount-box {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.04); border-radius: 10px; padding: 12px 14px;
+            margin-bottom: 14px;
+        }
+        .crypto-amount-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 1.5px; }
+        .crypto-amount-val { font-size: 16px; font-weight: 900; }
+        .crypto-note { font-size: 11px; color: #444; line-height: 1.6; }
+
+        /* Roblox form */
+        .field { margin-bottom: 20px; }
+        .field label {
+            display: block; font-size: 10px; font-weight: 700;
+            letter-spacing: 2px; color: #555; text-transform: uppercase; margin-bottom: 10px;
+        }
+        .field input {
+            width: 100%; padding: 15px 18px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; color: #fff; font-size: 14px; font-family: inherit;
+            outline: none; transition: all 0.25s;
+        }
+        .field input:focus {
+            border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.04);
+        }
+        .field input::placeholder { color: #333; }
+        .field-hint { font-size: 11px; color: #444; margin-top: 8px; line-height: 1.5; }
+
+        /* Confirm checkbox */
+        .confirm-row {
+            display: flex; align-items: flex-start; gap: 12px;
+            margin-bottom: 24px; cursor: pointer;
+        }
+        .confirm-row input[type=checkbox] { margin-top: 2px; accent-color: #fff; flex-shrink: 0; }
+        .confirm-row span { font-size: 12px; color: #555; line-height: 1.6; }
+
+        /* Buttons */
+        .btn-main {
+            width: 100%; padding: 17px;
+            background: #fff; color: #000; border: none;
+            border-radius: 14px; font-size: 11px; font-weight: 800;
+            letter-spacing: 2.5px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.2s; font-family: inherit;
+        }
+        .btn-main:hover { background: #f0f0f0; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,255,255,0.12); }
+        .btn-main:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-back-step {
+            width: 100%; padding: 13px;
+            background: transparent; color: #555; border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; font-size: 11px; font-weight: 700;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.2s; font-family: inherit;
+            margin-top: 10px;
+        }
+        .btn-back-step:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+
+        /* Success */
+        .success-icon {
+            width: 72px; height: 72px;
+            background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+        }
+        .success-icon svg { width: 36px; height: 36px; fill: #22c55e; }
+        .success-title { font-size: 24px; font-weight: 900; text-align: center; margin-bottom: 10px; }
+        .success-sub { font-size: 14px; color: #666; text-align: center; line-height: 1.6; margin-bottom: 28px; }
+        .success-info {
+            background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.15);
+            border-radius: 14px; padding: 20px; margin-bottom: 20px;
+        }
+        .success-info-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+        .success-info-row:last-child { margin-bottom: 0; }
+        .success-info-label { color: #555; }
+        .success-info-val { font-weight: 700; }
+
+        /* Error msg */
+        #error-msg { font-size: 12px; color: #ef4444; margin-bottom: 12px; min-height: 16px; }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .checkout-wrap { grid-template-columns: 1fr; }
+            .method-grid { grid-template-columns: 1fr 1fr; }
+            .back-link { top: 16px; left: 16px; }
+            body { padding: 70px 16px 24px; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    Wróć
+</a>
+
+<div class="checkout-wrap">
+
+    <!-- LEFT: Order summary -->
+    <div class="card" id="order-summary">
+        <div class="order-label">Twoje zamówienie</div>
+        <div class="order-product">
+            <div class="order-icon dark" id="summary-icon">
+                <svg viewBox="0 0 24 24"><path d="M6 2l-4 4 4 4 4-4-4-4zm6.5 7C11.12 9 10 10.12 10 11.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5S13.88 9 12.5 9zM17 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/></svg>
+            </div>
+            <div>
+                <div class="order-type" id="summary-type">PAKIET ROBUX</div>
+                <div class="order-name" id="summary-name">1 000 ROBUX</div>
+            </div>
+        </div>
+        <div class="divider-line"></div>
+        <div class="price-row">
+            <span class="price-row-label">Produkt</span>
+            <span class="price-row-val" id="summary-price-sub">33,00 zł</span>
+        </div>
+        <div class="price-row">
+            <span class="price-row-label">Dostawa</span>
+            <span class="price-row-val" style="color:#22c55e;">GRATIS</span>
+        </div>
+        <div class="divider-line"></div>
+        <div class="price-total">
+            <span class="price-total-label">RAZEM</span>
+            <span class="price-total-val" id="summary-price-total">33,00 zł</span>
+        </div>
+        <div class="trust-badges">
+            <div class="trust-badge">
+                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                Bezpieczna transakcja
+            </div>
+            <div class="trust-badge">
+                <svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+                Dostawa do 6 godzin
+            </div>
+            <div class="trust-badge">
+                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+                Wsparcie 24/7
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: Payment form -->
+    <div class="card">
+        <div class="form-label-top">Płatność</div>
+
+        <!-- Steps indicator -->
+        <div class="steps">
+            <div class="step active" id="step1">
+                <div class="step-num">1</div>
+                Metoda
+            </div>
+            <div class="step" id="step2">
+                <div class="step-num">2</div>
+                Płatność
+            </div>
+            <div class="step" id="step3">
+                <div class="step-num">3</div>
+                Link
+            </div>
+        </div>
+
+        <!-- PAGE 1: Wybór metody -->
+        <div class="checkout-page active" id="page-method">
+            <div class="method-grid">
+                <div class="method-card" id="method-blik" onclick="selectMethod('blik')">
+                    <div class="method-icon">📱</div>
+                    <div class="method-name">BLIK</div>
+                    <div class="method-sub">Przelew na numer</div>
+                </div>
+                <div class="method-card" id="method-ltc" onclick="selectMethod('ltc')">
+                    <div class="method-icon">🪙</div>
+                    <div class="method-name">Litecoin</div>
+                    <div class="method-sub">Krypto LTC</div>
+                </div>
+            </div>
+            <p id="error-msg"></p>
+            <button class="btn-main" onclick="goToPayment()">DALEJ →</button>
+        </div>
+
+        <!-- PAGE 2a: BLIK -->
+        <div class="checkout-page" id="page-blik">
+            <div class="blik-box">
+                <div class="blik-title">Przelew BLIK na numer</div>
+                <div class="blik-number">690 178 013</div>
+                <div class="blik-amount">Kwota: <strong id="blik-amount-val">33,00 zł</strong></div>
+                <div class="blik-steps">
+                    <div class="blik-step">
+                        <div class="blik-step-num">1</div>
+                        <span>Otwórz swoją aplikację bankową i wybierz <strong>BLIK → Przelew na numer telefonu</strong></span>
+                    </div>
+                    <div class="blik-step">
+                        <div class="blik-step-num">2</div>
+                        <span>Wpisz numer <strong>690 178 013</strong> i kwotę <strong id="blik-amount-val2">33,00 zł</strong></span>
+                    </div>
+                    <div class="blik-step">
+                        <div class="blik-step-num">3</div>
+                        <span>Po wysłaniu kliknij "Zapłaciłem" poniżej</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-main" onclick="goToRobloxForm()">ZAPŁACIŁEM ✓</button>
+            <button class="btn-back-step" onclick="goBack(1)">← Zmień metodę</button>
+        </div>
+
+        <!-- PAGE 2b: LTC -->
+        <div class="checkout-page" id="page-ltc">
+            <div class="crypto-box">
+                <div class="crypto-title">Płatność Litecoin (LTC)</div>
+                <div class="crypto-network">⚡ Sieć Litecoin (LTC)</div>
+                <div class="crypto-address-label">Adres portfela</div>
+                <div class="crypto-address">
+                    <span style="word-break:break-all;">LSLVPzskezU8pvh4QPvQhf9G4UBzio4qSP</span>
+                    <button class="copy-btn" onclick="copyAddress()">KOPIUJ</button>
+                </div>
+                <div class="crypto-amount-box">
+                    <span class="crypto-amount-label">Do zapłaty (LTC)</span>
+                    <span class="crypto-amount-val" id="ltc-amount-ltc">
+                        <span style="font-size:12px;color:#555;">pobieranie kursu...</span>
+                    </span>
+                </div>
+                <div class="crypto-amount-box" style="margin-top:-8px;">
+                    <span class="crypto-amount-label">Równowartość PLN</span>
+                    <span style="font-size:14px;color:#888;" id="ltc-amount-pln-display">—</span>
+                </div>
+                <div style="
+                    background: rgba(255,255,255,0.05);
+                    border: 1px solid rgba(255,255,255,0.12);
+                    border-radius: 12px;
+                    padding: 16px 18px;
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: #fff;
+                    line-height: 1.6;
+                    margin-top: 4px;
+                ">
+                    ⚠️ Wyślij <strong>dokładną kwotę</strong> w LTC odpowiadającą cenie w złotych.<br>
+                    <span style="font-size:12px;font-weight:500;color:#888;">Po wysłaniu kliknij "Weryfikuj płatność" — sprawdzimy blockchain automatycznie.</span>
+                </div>
+            </div>
+
+            <!-- Weryfikacja status -->
+            <div id="ltc-verify-status" style="display:none;margin-bottom:16px;padding:14px 18px;border-radius:12px;font-size:13px;font-weight:600;"></div>
+
+            <button class="btn-main" id="ltc-verify-btn" onclick="verifyLTC()">WERYFIKUJ PŁATNOŚĆ</button>
+            <button class="btn-back-step" onclick="goBack(1)">← Zmień metodę</button>
+        </div>
+
+        <!-- PAGE 3: Link Roblox -->
+        <div class="checkout-page" id="page-roblox">
+            <div class="field">
+                <label>Twój link do profilu Roblox</label>
+                <input type="url" id="roblox-link" placeholder="https://www.roblox.com/users/123456789/profile">
+                <div class="field-hint">Wejdź na swój profil Roblox → skopiuj link z paska adresu</div>
+            </div>
+            <div class="field">
+                <label>Nick w Roblox</label>
+                <input type="text" id="roblox-nick" placeholder="TwójNick123">
+            </div>
+            <div class="field">
+                <label>E-mail kontaktowy (opcjonalnie)</label>
+                <input type="email" id="contact-email" placeholder="twoj@email.com">
+                <div class="field-hint">Prześlemy potwierdzenie gdy dostarczymy Robux</div>
+            </div>
+            <label class="confirm-row">
+                <input type="checkbox" id="confirm-check">
+                <span>Potwierdzam że dokonałem/am płatności i podane dane są prawidłowe</span>
+            </label>
+            <p id="error-msg2"></p>
+            <button class="btn-main" onclick="submitOrder()">WYŚLIJ ZAMÓWIENIE</button>
+            <button class="btn-back-step" onclick="goBack(2)">← Wróć do płatności</button>
+        </div>
+
+        <!-- PAGE 4: Sukces -->
+        <div class="checkout-page" id="page-success">
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+            <div class="success-title">Zamówienie przyjęte!</div>
+            <div class="success-sub">Dostarczymy Robux na Twój profil w ciągu <strong style="color:#fff;">do 6 godzin</strong>. Dostaniesz zaproszenie do grupy Roblox.</div>
+            <div class="success-info">
+                <div class="success-info-row">
+                    <span class="success-info-label">Produkt</span>
+                    <span class="success-info-val" id="success-product">1 000 ROBUX</span>
+                </div>
+                <div class="success-info-row">
+                    <span class="success-info-label">Metoda płatności</span>
+                    <span class="success-info-val" id="success-method">BLIK</span>
+                </div>
+                <div class="success-info-row">
+                    <span class="success-info-label">Nick Roblox</span>
+                    <span class="success-info-val" id="success-nick">—</span>
+                </div>
+                <div class="success-info-row">
+                    <span class="success-info-label">Status</span>
+                    <span class="success-info-val" style="color:#f97316;">⏳ Oczekuje na weryfikację</span>
+                </div>
+            </div>
+            <a href="index.html" class="btn-main" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">WRÓĆ DO SKLEPU</a>
+        </div>
+
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDD3Z98au_WMwaawKi3lFJsycC0GCdW0jQ",
+        authDomain: "lajciorstore.firebaseapp.com",
+        projectId: "lajciorstore",
+        storageBucket: "lajciorstore.firebasestorage.app",
+        messagingSenderId: "7091718515313",
+        appId: "1:7091718515313:web:87fdad9a266aa88edd320e"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Expose submitOrder to window (needs Firebase)
+    window._submitOrderFirebase = async (productName, productType, productPrice, productGame, selectedMethod, link, nick, email) => {
+        await addDoc(collection(db, 'orders'), {
+            title: productName,
+            type: productType,
+            game: productGame,
+            price: parseFloat(productPrice.replace(' zł','').replace(',','.')),
+            paymentMethod: selectedMethod === 'blik' ? 'BLIK' : 'Litecoin (LTC)',
+            robloxLink: link,
+            clientNick: nick,
+            clientEmail: email || null,
+            status: 'pending',
+            createdAt: serverTimestamp()
+        });
+    };
+</script>
+
+<script>
+    // ── State ──
+    var selectedMethod = null;
+    var expectedLTC = null;
+    var LTC_ADDRESS = 'LSLVPzskezU8pvh4QPvQhf9G4UBzio4qSP';
+
+    // ── URL params ──
+    var params = new URLSearchParams(window.location.search);
+    var productName  = params.get('product') || '1 000 ROBUX';
+    var productType  = params.get('type')    || 'PAKIET ROBUX';
+    var productPrice = params.get('price')   || '33,00 zł';
+    var productGame  = params.get('game')    || 'robux';
+
+    // ── Fill summary ──
+    document.getElementById('summary-name').textContent         = productName;
+    document.getElementById('summary-type').textContent         = productType;
+    document.getElementById('summary-price-sub').textContent    = productPrice;
+    document.getElementById('summary-price-total').textContent  = productPrice;
+    document.getElementById('blik-amount-val').textContent      = productPrice;
+    document.getElementById('blik-amount-val2').textContent     = productPrice;
+    document.getElementById('success-product').textContent      = productName;
+    document.title = 'LITESTORE \u2014 ' + productName;
+
+    if (productGame === 'robux') {
+        document.getElementById('summary-icon').innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 2l-4 4 4 4 4-4-4-4zm6.5 7C11.12 9 10 10.12 10 11.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5S13.88 9 12.5 9zM17 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/></svg>';
+        document.getElementById('summary-icon').className = 'order-icon dark';
+    }
+
+    // ── Helpers ──
+    function setPage(id) {
+        document.querySelectorAll('.checkout-page').forEach(function(p) { p.classList.remove('active'); });
+        document.getElementById(id).classList.add('active');
+    }
+
+    function setStep(n) {
+        for (var i = 1; i <= 3; i++) {
+            var el = document.getElementById('step' + i);
+            el.classList.remove('active', 'done');
+            if (i < n) el.classList.add('done');
+            else if (i === n) el.classList.add('active');
+        }
+    }
+
+    function showLTCStatus(type, msg) {
+        var el = document.getElementById('ltc-verify-status');
+        el.style.display = 'block';
+        el.textContent = msg;
+        var styles = {
+            success: ['rgba(34,197,94,0.1)',  '1px solid rgba(34,197,94,0.25)',  '#22c55e'],
+            error:   ['rgba(239,68,68,0.08)', '1px solid rgba(239,68,68,0.2)',   '#ef4444'],
+            info:    ['rgba(255,255,255,0.05)','1px solid rgba(255,255,255,0.1)', '#888']
+        };
+        var s = styles[type] || styles.info;
+        el.style.background = s[0]; el.style.border = s[1]; el.style.color = s[2];
+    }
+
+    // ── Method select ──
+    window.selectMethod = function(m) {
+        selectedMethod = m;
+        document.getElementById('method-blik').classList.toggle('selected', m === 'blik');
+        document.getElementById('method-ltc').classList.toggle('selected',  m === 'ltc');
+        document.getElementById('error-msg').textContent = '';
+    };
+
+    // ── Step 1 → 2 ──
+    window.goToPayment = function() {
+        if (!selectedMethod) {
+            document.getElementById('error-msg').textContent = 'Wybierz metodę płatności.';
+            return;
+        }
+        setPage(selectedMethod === 'blik' ? 'page-blik' : 'page-ltc');
+        setStep(2);
+        if (selectedMethod === 'ltc') fetchLTCRate();
+    };
+
+    // ── Step 2 → 3 ──
+    window.goToRobloxForm = function() {
+        setPage('page-roblox');
+        setStep(3);
+    };
+
+    // ── Back ──
+    window.goBack = function(toStep) {
+        if (toStep === 1) { setPage('page-method'); setStep(1); }
+        if (toStep === 2) { setPage(selectedMethod === 'blik' ? 'page-blik' : 'page-ltc'); setStep(2); }
+    };
+
+    // ── Copy LTC address ──
+    window.copyAddress = function() {
+        navigator.clipboard.writeText(LTC_ADDRESS);
+        var btn = document.querySelector('.copy-btn');
+        btn.textContent = 'SKOPIOWANO!';
+        btn.style.color = '#22c55e';
+        setTimeout(function() { btn.textContent = 'KOPIUJ'; btn.style.color = ''; }, 2000);
+    };
+
+
+    // ── Fetch LTC rate (Binance public API — brak CORS blokady) ──
+    function fetchLTCRate() {
+        // Binance: LTC/USDT price, potem stały przelicznik USDT≈PLN z NBP
+        Promise.all([
+            fetch('https://api.binance.com/api/v3/ticker/price?symbol=LTCUSDT').then(function(r){ return r.json(); }),
+            fetch('https://api.nbp.pl/api/exchangerates/rates/a/usd/?format=json').then(function(r){ return r.json(); })
+        ])
+        .then(function(results) {
+            var ltcUsdt = parseFloat(results[0].price);
+            var usdPln  = parseFloat(results[1].rates[0].mid);
+            var ltcPln  = ltcUsdt * usdPln;
+            var pln     = parseFloat(productPrice.replace(' zł','').replace(',','.'));
+            expectedLTC = pln / ltcPln;
+            document.getElementById('ltc-amount-ltc').textContent        = expectedLTC.toFixed(6) + ' LTC';
+            document.getElementById('ltc-amount-pln-display').textContent = productPrice;
+        })
+        .catch(function(e) {
+            document.getElementById('ltc-amount-ltc').innerHTML = '<span style="color:#ef4444;font-size:12px;">Błąd pobierania kursu — odśwież stronę</span>';
+            console.error('LTC rate error:', e);
+        });
+    }
+
+    // ── Verify LTC on-chain ──
+    window.verifyLTC = function() {
+        var btn = document.getElementById('ltc-verify-btn');
+        if (!expectedLTC) { showLTCStatus('error', '⏳ Poczekaj — pobieramy kurs LTC.'); return; }
+        btn.textContent = 'SPRAWDZANIE...';
+        btn.disabled = true;
+        showLTCStatus('info', '🔍 Sprawdzamy blockchain Litecoin...');
+
+        fetch('https://api.blockcypher.com/v1/ltc/main/addrs/' + LTC_ADDRESS + '/full?limit=10')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data.txs || data.txs.length === 0) {
+                    showLTCStatus('error', '❌ Nie wykryto transakcji. Upewnij się że wysłałeś LTC i spróbuj za chwilę.');
+                    btn.textContent = 'WERYFIKUJ PONOWNIE'; btn.disabled = false; return;
+                }
+                var now      = Date.now();
+                var limit    = 30 * 60 * 1000;
+                var tolerance = 0.002;
+                var match = null;
+                for (var i = 0; i < data.txs.length; i++) {
+                    var tx  = data.txs[i];
+                    var age = now - new Date(tx.received).getTime();
+                    if (age > limit) continue;
+                    for (var j = 0; j < tx.outputs.length; j++) {
+                        var out = tx.outputs[j];
+                        if (!out.addresses || out.addresses.indexOf(LTC_ADDRESS) === -1) continue;
+                        var received = out.value / 1e8;
+                        if (Math.abs(received - expectedLTC) <= tolerance) { match = tx; break; }
+                    }
+                    if (match) break;
+                }
+                if (match) {
+                    showLTCStatus('success', '✅ Płatność zweryfikowana! Możesz przejść dalej.');
+                    btn.textContent = 'ZWERYFIKOWANO ✓';
+                    btn.style.background = '#22c55e'; btn.style.color = '#000';
+                    btn.onclick = window.goToRobloxForm;
+                    btn.disabled = false;
+                } else {
+                    showLTCStatus('error', '❌ Nie wykryto płatności ' + expectedLTC.toFixed(6) + ' LTC w ciągu 30 min. Sprawdź kwotę i spróbuj ponownie.');
+                    btn.textContent = 'WERYFIKUJ PONOWNIE'; btn.disabled = false;
+                }
+            })
+            .catch(function() {
+                showLTCStatus('error', '⚠️ Błąd połączenia z blockchain. Spróbuj za chwilę.');
+                btn.textContent = 'WERYFIKUJ PŁATNOŚĆ'; btn.disabled = false;
+            });
+    };
+
+    // ── Submit order ──
+    window.submitOrder = function() {
+        var link      = document.getElementById('roblox-link').value.trim();
+        var nick      = document.getElementById('roblox-nick').value.trim();
+        var email     = document.getElementById('contact-email').value.trim();
+        var confirmed = document.getElementById('confirm-check').checked;
+        var err       = document.getElementById('error-msg2');
+
+        if (!link)                      { err.textContent = 'Podaj link do profilu Roblox.'; return; }
+        if (!nick)                      { err.textContent = 'Podaj nick w Roblox.'; return; }
+        if (!confirmed)                 { err.textContent = 'Potwierdź że dokonałeś płatności.'; return; }
+        if (!link.includes('roblox.com')){ err.textContent = 'Link musi prowadzić do roblox.com'; return; }
+
+        err.textContent = '';
+        var btn = document.querySelector('#page-roblox .btn-main');
+        btn.textContent = 'WYSYŁANIE...'; btn.disabled = true;
+
+        window._submitOrderFirebase(productName, productType, productPrice, productGame, selectedMethod, link, nick, email)
+            .then(function() {
+                document.getElementById('success-method').textContent = selectedMethod === 'blik' ? 'BLIK' : 'Litecoin (LTC)';
+                document.getElementById('success-nick').textContent   = nick;
+                setPage('page-success'); setStep(3);
+            })
+            .catch(function() {
+                err.textContent = 'Błąd wysyłania. Spróbuj ponownie.';
+                btn.textContent = 'WYŚLIJ ZAMÓWIENIE'; btn.disabled = false;
+            });
+    };
+</script>
+
+</body>
+</html>

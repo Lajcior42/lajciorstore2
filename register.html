@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LITESTORE — Rejestracja</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: #111;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 80% 90%, rgba(255,255,255,0.02) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .register-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            margin: 24px;
+            padding: 48px 44px;
+
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(40px) saturate(160%);
+            -webkit-backdrop-filter: blur(40px) saturate(160%);
+
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 28px;
+
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.14) inset,
+                0 -1px 0 rgba(0,0,0,0.4) inset,
+                0 32px 80px rgba(0,0,0,0.6),
+                0 8px 24px rgba(0,0,0,0.4);
+
+            animation: cardIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+
+        .register-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 12%;
+            right: 12%;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.5) 40%,
+                rgba(255,255,255,0.5) 60%,
+                transparent
+            );
+            border-radius: 100%;
+            pointer-events: none;
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 36px;
+            animation: fadeUp 0.5s 0.1s cubic-bezier(0.4,0,0.2,1) both;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: #fff;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 3px;
+        }
+
+        .register-heading {
+            animation: fadeUp 0.5s 0.15s cubic-bezier(0.4,0,0.2,1) both;
+        }
+
+        .register-heading h1 {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        .register-sub {
+            font-size: 13px;
+            color: #555;
+            margin-top: 8px;
+            margin-bottom: 32px;
+            animation: fadeUp 0.5s 0.2s cubic-bezier(0.4,0,0.2,1) both;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        .field:nth-child(1) { animation: fadeUp 0.5s 0.22s cubic-bezier(0.4,0,0.2,1) both; }
+        .field:nth-child(2) { animation: fadeUp 0.5s 0.26s cubic-bezier(0.4,0,0.2,1) both; }
+        .field:nth-child(3) { animation: fadeUp 0.5s 0.30s cubic-bezier(0.4,0,0.2,1) both; }
+        .field:nth-child(4) { animation: fadeUp 0.5s 0.34s cubic-bezier(0.4,0,0.2,1) both; }
+
+        .field label {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            color: #444;
+            text-transform: uppercase;
+            margin-bottom: 9px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+        }
+
+        .field input:focus {
+            border-color: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.07);
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.04);
+        }
+
+        .field input::placeholder {
+            color: #2e2e2e;
+        }
+
+        .field input.error {
+            border-color: rgba(255, 80, 80, 0.4);
+        }
+
+        .field-hint {
+            font-size: 10px;
+            color: #333;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .terms {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin: 20px 0 24px;
+            animation: fadeUp 0.5s 0.36s cubic-bezier(0.4,0,0.2,1) both;
+        }
+
+        .terms input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 1px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .terms input[type="checkbox"]:checked {
+            background: #fff;
+            border-color: #fff;
+        }
+
+        .terms input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 1px;
+            width: 5px;
+            height: 9px;
+            border: 2px solid #000;
+            border-top: none;
+            border-left: none;
+            transform: rotate(45deg);
+        }
+
+        .terms label {
+            font-size: 12px;
+            color: #444;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        .terms label a {
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 1px;
+            transition: border-color 0.2s;
+        }
+
+        .terms label a:hover {
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            animation: fadeUp 0.5s 0.38s cubic-bezier(0.4,0,0.2,1) both;
+        }
+
+        .btn-submit:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,255,255,0.15);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 24px 0;
+            animation: fadeUp 0.5s 0.4s cubic-bezier(0.4,0,0.2,1) both;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.07);
+        }
+
+        .divider span {
+            font-size: 10px;
+            color: #333;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .login-link {
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            animation: fadeUp 0.5s 0.42s cubic-bezier(0.4,0,0.2,1) both;
+        }
+
+        .login-link a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 1px;
+            transition: border-color 0.2s;
+        }
+
+        .login-link a:hover {
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .back-link {
+            position: fixed;
+            top: 28px;
+            left: 28px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #444;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.2s;
+            animation: fadeIn 0.5s 0.1s both;
+        }
+
+        .back-link:hover { color: #fff; }
+
+        .back-link svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        @media (max-width: 480px) {
+            .register-card {
+                padding: 36px 28px;
+                margin: 16px;
+            }
+
+            .back-link {
+                top: 18px;
+                left: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="login.html" class="back-link">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Wróć
+    </a>
+
+    <div class="register-card">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:#000;" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L20 8.5v.01L12 13 4 8.51 12 4.18zM4 10.18l8 4.5v6.14L4 16.32V10.18zm10 10.64v-6.14l8-4.5v6.14l-8 4.5z"/></svg>
+            </div>
+            <span class="logo-text">LITESTORE</span>
+        </div>
+
+        <div class="register-heading">
+            <h1>Załóż konto</h1>
+        </div>
+        <p class="register-sub">Dołącz do LiteStore i zacznij kupować</p>
+
+        <div class="field">
+            <label>Nick</label>
+            <input type="text" id="nick" placeholder="jak chcesz być nazywany">
+        </div>
+
+        <div class="field">
+            <label>E-mail</label>
+            <input type="email" id="email" placeholder="twoj@email.com">
+        </div>
+
+        <div class="field">
+            <label>Hasło</label>
+            <input type="password" id="password" placeholder="••••••••">
+            <div class="field-hint">Minimum 8 znaków</div>
+        </div>
+
+        <div class="field">
+            <label>Powtórz hasło</label>
+            <input type="password" id="password2" placeholder="••••••••">
+        </div>
+
+        <div class="terms">
+            <input type="checkbox" id="terms-check">
+            <label for="terms-check">
+                Akceptuję <a href="#">regulamin</a> i <a href="#">politykę prywatności</a> serwisu LiteStore
+            </label>
+        </div>
+
+        <p id="error-msg" style="font-size:12px;color:#ef4444;margin-bottom:12px;min-height:16px;"></p>
+
+        <button class="btn-submit" id="registerBtn" onclick="handleRegister()">
+            ZAREJESTRUJ SIĘ
+        </button>
+
+        <div class="divider"><span>lub</span></div>
+
+        <p class="login-link">Masz już konto? <a href="login.html">Zaloguj się</a></p>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDD3Z98au_WMwaawKi3lFJsycC0GCdW0jQ",
+            authDomain: "lajciorstore.firebaseapp.com",
+            projectId: "lajciorstore",
+            storageBucket: "lajciorstore.firebasestorage.app",
+            messagingSenderId: "7091718515313",
+            appId: "1:7091718515313:web:87fdad9a266aa88edd320e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.handleRegister = async function() {
+            const nick = document.getElementById('nick').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const password2 = document.getElementById('password2').value;
+            const terms = document.getElementById('terms-check').checked;
+            const btn = document.getElementById('registerBtn');
+            const err = document.getElementById('error-msg');
+
+            err.textContent = '';
+
+            if (!nick || !email || !password || !password2) {
+                err.textContent = 'Wypełnij wszystkie pola.'; return;
+            }
+            if (password.length < 8) {
+                err.textContent = 'Hasło musi mieć minimum 8 znaków.'; return;
+            }
+            if (password !== password2) {
+                err.textContent = 'Hasła nie są identyczne.'; return;
+            }
+            if (!terms) {
+                err.textContent = 'Musisz zaakceptować regulamin.'; return;
+            }
+
+            btn.textContent = 'TWORZENIE KONTA...';
+            btn.disabled = true;
+
+            try {
+                // 1. Utwórz konto w Firebase Auth
+                const cred = await createUserWithEmailAndPassword(auth, email, password);
+                await updateProfile(cred.user, { displayName: nick });
+
+                // 2. Utwórz profil użytkownika w Firestore
+                await setDoc(doc(db, 'users', cred.user.uid), {
+                    nick: nick,
+                    email: email,
+                    status: 'Standard',
+                    rabat: 0,
+                    wydano: 0,
+                    zamowienia: [],
+                    dataRejestracji: serverTimestamp()
+                });
+
+                window.location.href = 'index.html';
+            } catch (e) {
+                btn.textContent = 'ZAREJESTRUJ SIĘ';
+                btn.disabled = false;
+                if (e.code === 'auth/email-already-in-use') {
+                    err.textContent = 'Ten e-mail jest już zajęty.';
+                } else if (e.code === 'auth/invalid-email') {
+                    err.textContent = 'Nieprawidłowy adres e-mail.';
+                } else if (e.code === 'auth/weak-password') {
+                    err.textContent = 'Hasło jest za słabe.';
+                } else {
+                    err.textContent = 'Błąd rejestracji. Spróbuj ponownie.';
+                }
+            }
+        };
+    </script>
+
+</body>
+</html>
