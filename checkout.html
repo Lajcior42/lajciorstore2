@@ -683,6 +683,7 @@
     var productType  = params.get('type')    || 'PAKIET ROBUX';
     var productPrice = params.get('price')   || '33,00 zł';
     var productGame  = params.get('game')    || 'robux';
+    var productRobux = params.get('robux') ? parseInt(params.get('robux')) : null;
 
     // ── Fill summary ──
     document.getElementById('summary-name').textContent         = productName;
@@ -749,9 +750,7 @@
 
     // ── Step 2 → 3 (Gamepass) ──
     window.goToGamepass = function() {
-        // Ustaw cenę w ROBUX dla gamepassu
-        var pln = parseFloat(productPrice.replace(' zł','').replace(',','.'));
-        var robuxPrice = Math.round(pln * 1.43); // ~1 PLN = 1.43 ROBUX (Roblox exchange rate)
+        var robuxPrice = productRobux || Math.round(parseFloat(productPrice.replace(' zł','').replace(',','.')) * 1.43);
         document.getElementById('gamepass-price').textContent = robuxPrice + ' ROBUX';
         setPage('page-gamepass');
         setStep(3);
@@ -903,4 +902,5 @@
 
 </body>
 </html>
+
 
